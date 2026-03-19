@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2e7d32">
+<title>ParkBike</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter',sans-serif; overflow:hidden; }
+
+/* ── AUTH ── */
+#auth {
+  position:fixed; inset:0; z-index:9999;
+  background:#f0f4ff;
+  display:flex; align-items:center; justify-content:center;
+  padding:20px;
+  font-family:'Inter',sans-serif;
+}
+#auth::before {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse at 20% 20%, rgba(99,102,241,.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(236,72,153,.10) 0%, transparent 55%);
+  pointer-events:none;
+}
+.a-wrap { position:relative; z-index:1; width:100%; max-width:380px; }
+.a-logo { text-align:center; margin-bottom:24px; }
+.a-icon { width:80px; height:80px; background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 60%,#a78bfa 100%); border-radius:24px; display:inline-flex; align-items:center; justify-content:center; font-size:44px; margin-bottom:14px; box-shadow:0 8px 32px rgba(99,102,241,.45), 0 2px 8px rgba(99,102,241,.25); transform:rotate(-6deg); transition:transform .3s; }
+.a-icon:hover { transform:rotate(0deg) scale(1.05); }
+.a-title { font-family:'Sora',sans-serif; font-size:1.6rem; font-weight:700; color:#0f172a; letter-spacing:-1px; }
+.a-title span { color:#6366f1; }
+.a-sub { color:#64748b; font-size:.82rem; margin-top:4px; }
+.a-card { background:#ffffff; border-radius:24px; padding:24px; width:100%; box-shadow:0 2px 4px rgba(0,0,0,.04), 0 12px 40px rgba(99,102,241,.12), 0 40px 80px rgba(99,102,241,.06); border:1px solid rgba(255,255,255,.8); }
+.a-tabs { display:flex; background:#f1f3f8; border-radius:14px; padding:4px; margin-bottom:22px; gap:4px; }
+.a-tab { flex:1; padding:10px; border:none; background:transparent; font-family:'Inter',sans-serif; font-size:.88rem; font-weight:600; color:#94a3b8; border-radius:10px; cursor:pointer; transition:all .2s; }
+.a-tab.on { background:#fff; color:#6366f1; box-shadow:0 1px 8px rgba(99,102,241,.15), 0 1px 2px rgba(0,0,0,.06); }
+.a-field { margin-bottom:14px; }
+.a-field label { display:block; font-size:.68rem; color:#94a3b8; font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; font-weight:700; }
+.a-field input { width:100%; padding:13px 16px; background:#ffffff; border:1.5px solid #eef0f6; border-radius:12px; font-family:'Inter',sans-serif; font-size:.92rem; color:#0f172a; outline:none; transition:all .2s; }
+.a-field input:focus { border-color:#6366f1; background:#fff; box-shadow:0 0 0 4px rgba(99,102,241,.1); }
+.a-err { min-height:18px; font-size:.72rem; color:#ef4444; font-family:'Sora',sans-serif; margin-bottom:6px; }
+.a-btn { width:100%; padding:15px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:14px; font-family:'Inter',sans-serif; font-weight:700; font-size:1rem; cursor:pointer; box-shadow:0 6px 20px rgba(99,102,241,.45), 0 2px 6px rgba(99,102,241,.25); transition:all .2s; letter-spacing:.3px; margin-top:6px; }
+.a-btn:hover { box-shadow:0 10px 28px rgba(99,102,241,.55), 0 2px 8px rgba(99,102,241,.3); transform:translateY(-1px); }
+.a-btn:active { opacity:.9; transform:scale(.98) translateY(0); }
+.a-note { font-size:.72rem; color:#94a3b8; text-align:center; margin-top:12px; line-height:1.6; }
+.a-demo { color:#6366f1; font-size:.72rem; font-weight:600; }
+
+
+
+/* ── APP ── */
+#app { display:none; flex-direction:column; height:100%; overflow:hidden; }
+#app.show { display:flex; }
+.hdr { height:54px; background:#fff; border-bottom:1px solid #e2e6ed; display:flex; align-items:center; justify-content:space-between; padding:0 14px; flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,.07); z-index:200; }
+.hdr-logo { display:flex; align-items:center; gap:8px; }
+.hdr-icon { width:34px; height:34px; background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 50%,#a855f7 100%); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 4px 12px rgba(99,102,241,.4); transform:rotate(-4deg); }
+.hdr-name { font-family:'Sora',sans-serif; font-weight:700; font-size:.92rem; }
+.hdr-name span { color:#6366f1; }
+.hdr-right { display:flex; align-items:center; gap:6px; }
+.user-chip { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:100px; background:#e8f5e9; border:1px solid #a5d6a7; }
+.user-av { width:22px; height:22px; background:#2e7d32; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.7rem; color:#fff; font-weight:700; }
+.user-nm { font-size:.75rem; font-weight:600; color:#2e7d32; max-width:72px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.btn-out { background:none; border:none; color:#9ca3af; font-size:.72rem; cursor:pointer; padding:2px 4px; }
+.btn-add { display:none; padding:7px 13px; border-radius:100px; background:#2e7d32; color:#fff; font-family:'Inter',sans-serif; font-weight:700; font-size:.78rem; border:none; cursor:pointer; }
+.btn-adm { padding:7px 12px; border-radius:100px; border:1px solid #e2e6ed; background:#fff; color:#6b7280; font-family:'Inter',sans-serif; font-size:.78rem; cursor:pointer; }
+.btn-adm.on { border-color:#7c3aed; color:#7c3aed; background:#f5f3ff; }
+
+/* ADMIN BAR */
+.adm-bar { display:none; align-items:center; gap:8px; padding:7px 14px; background:#f5f3ff; border-bottom:2px solid rgba(124,58,237,.25); font-size:.72rem; color:#7c3aed; font-family:'Sora',sans-serif; flex-shrink:0; }
+.adm-bar.show { display:flex; }
+.adm-dot { width:7px; height:7px; border-radius:50%; background:#7c3aed; animation:pulse 1.5s infinite; flex-shrink:0; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.adm-right { display:flex; gap:6px; margin-left:auto; }
+.adm-btn { padding:4px 10px; border-radius:6px; border:1px solid rgba(124,58,237,.3); background:none; color:#7c3aed; font-family:'Sora',sans-serif; font-size:.62rem; cursor:pointer; }
+.adm-btn.red { border-color:rgba(220,38,38,.35); color:#dc2626; }
+
+/* FILTERS */
+.search-bar { padding:8px 12px; background:#fff; border-bottom:1px solid #e2e6ed; flex-shrink:0; }
+.search-wrap { position:relative; }
+.search-wrap input { width:100%; padding:9px 12px 9px 36px; background:#f1f3f6; border:1.5px solid #e2e6ed; border-radius:100px; font-family:'Inter',sans-serif; font-size:.85rem; color:#1a1f2e; outline:none; }
+.search-wrap input:focus { border-color:#2e7d32; background:#fff; }
+.search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:.9rem; pointer-events:none; }
+.search-clear { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:#9ca3af; cursor:pointer; font-size:.85rem; display:none; padding:2px 4px; }
+.search-clear.show { display:block; }
+.filters { height:46px; background:#fff; border-bottom:1px solid #e2e6ed; display:flex; align-items:center; gap:6px; padding:0 12px; flex-shrink:0; overflow-x:auto; scrollbar-width:none; }
+.filters::-webkit-scrollbar { display:none; }
+.fbtn { display:flex; align-items:center; gap:5px; padding:5px 12px; border-radius:100px; border:1.5px solid #e2e6ed; background:none; color:#6b7280; font-family:'Inter',sans-serif; font-size:.78rem; font-weight:500; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+.fbtn.f-bike { border-color:#2e7d32; color:#2e7d32; background:#e8f5e9; }
+.fbtn.f-scooter { border-color:#0277bd; color:#0277bd; background:#e3f2fd; }
+.fbtn.f-both { border-color:#e65100; color:#e65100; background:#fff3e0; }
+.fav-filter { display:flex; align-items:center; gap:5px; padding:5px 12px; border-radius:100px; border:1.5px solid #e2e6ed; background:none; color:#6b7280; font-family:'Inter',sans-serif; font-size:.78rem; font-weight:500; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+.fav-filter.on { border-color:#f59e0b; color:#f59e0b; background:#fffbeb; }
+.fdot { width:7px; height:7px; border-radius:50%; }
+
+/* CONTENT */
+.content { flex:1; display:flex; position:relative; overflow:hidden; min-height:0; height:100%; }
+#map { flex:1; z-index:1; min-height:0; height:100%; }
+
+/* SIDEBAR */
+.sidebar { width:340px; background:#fff; border-left:1px solid #e2e6ed; display:flex; flex-direction:column; flex-shrink:0; position:relative; overflow:hidden; }
+.sb-head { padding:12px 16px; border-bottom:1px solid #e2e6ed; flex-shrink:0; }
+.sb-title { font-size:.68rem; color:#6b7280; font-family:'Sora',sans-serif; text-transform:uppercase; letter-spacing:.8px; }
+.sb-count { font-size:.8rem; font-weight:600; color:#1a1f2e; margin-top:2px; }
+.park-list { overflow-y:auto; flex:1; }
+.park-list::-webkit-scrollbar { width:3px; }
+.park-list::-webkit-scrollbar-thumb { background:#e2e6ed; }
+
+/* PARK CARD */
+.pcard { padding:13px 16px; border-bottom:1px solid #e2e6ed; cursor:pointer; background:#fff; }
+.pcard:hover, .pcard.sel { background:#f0f4ff; }
+.pc-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:4px; }
+.pc-name { font-size:.88rem; font-weight:600; line-height:1.25; flex:1; font-family:'Sora',sans-serif; }
+.pc-pills { display:flex; flex-direction:column; align-items:flex-end; gap:3px; flex-shrink:0; }
+.pill { font-size:.58rem; font-family:'Sora',sans-serif; font-weight:700; padding:2px 7px; border-radius:100px; white-space:nowrap; }
+.p-bike { background:#e8f5e9; color:#2e7d32; }
+.p-scooter { background:#e3f2fd; color:#0277bd; }
+.p-both { background:#fff3e0; color:#e65100; }
+.p-open { background:#e8f5e9; color:#2e7d32; }
+.p-closed { background:#ffebee; color:#c62828; }
+.p-adm { background:#f5f3ff; color:#7c3aed; border:1px solid rgba(124,58,237,.2); }
+.pc-addr { font-size:.73rem; color:#6b7280; margin-bottom:5px; }
+.pc-meta { display:flex; align-items:center; justify-content:space-between; }
+.pc-stars { display:flex; align-items:center; gap:3px; font-size:.73rem; color:#6b7280; font-family:'Sora',sans-serif; }
+.star-txt { color:#f59e0b; }
+.pc-cost { font-size:.71rem; font-family:'Sora',sans-serif; color:#e65100; font-weight:700; }
+.adm-row { display:flex; gap:5px; margin-top:8px; padding-top:8px; border-top:1px solid rgba(124,58,237,.15); }
+.adm-ca { flex:1; padding:6px; border-radius:7px; border:1px solid rgba(124,58,237,.25); background:none; color:#7c3aed; font-family:'Inter',sans-serif; font-size:.72rem; cursor:pointer; text-align:center; }
+.adm-ca.del { border-color:rgba(220,38,38,.3); color:#dc2626; }
+
+/* DETAIL PANEL */
+.detail { position:absolute; inset:0; background:#fff; z-index:100; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .28s ease; }
+.detail.open { transform:translateX(0); }
+.det-hdr { display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #e2e6ed; flex-shrink:0; }
+.det-back { background:none; border:1.5px solid #e2e6ed; color:#6b7280; padding:5px 10px; border-radius:8px; cursor:pointer; font-family:'Sora',sans-serif; font-size:.67rem; }
+.det-title { font-size:.85rem; font-weight:700; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:'Sora',sans-serif; }
+.det-edit { padding:5px 10px; border-radius:8px; border:1px solid rgba(124,58,237,.25); background:none; color:#7c3aed; font-family:'Inter',sans-serif; font-size:.72rem; cursor:pointer; display:none; }
+.det-body { overflow-y:auto; flex:1; padding:16px; }
+.det-badges { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:9px; }
+.det-addr { font-size:.77rem; color:#6b7280; margin-bottom:13px; }
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+.ibox { background:#f1f3f6; border:1px solid #e2e6ed; border-radius:12px; padding:11px; }
+.ibox-lbl { font-size:.58rem; color:#6b7280; font-family:'Sora',sans-serif; text-transform:uppercase; margin-bottom:4px; }
+.ibox-val { font-size:.92rem; font-weight:700; }
+.v-green { color:#2e7d32; } .v-red { color:#c62828; } .v-yellow { color:#f59e0b; } .v-orange { color:#e65100; font-size:.82rem; }
+.contact-block { margin-bottom:14px; }
+.contact-lbl { font-size:.63rem; color:#6b7280; font-family:'Sora',sans-serif; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.contact-link { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; text-decoration:none; margin-bottom:8px; }
+.contact-link-phone { background:#e8f5e9; border:1.5px solid #a5d6a7; color:#1b5e20; }
+.contact-link-web { background:#fce4ec; border:1.5px solid #f48fb1; color:#880e4f; }
+.contact-icon { font-size:1.3rem; line-height:1; flex-shrink:0; }
+.contact-info-lbl { font-size:.58rem; font-family:'Sora',sans-serif; text-transform:uppercase; margin-bottom:2px; opacity:.7; }
+.contact-info-val { font-size:.88rem; font-weight:600; word-break:break-all; }
+.sec-title { font-size:.63rem; color:#6b7280; font-family:'Sora',sans-serif; text-transform:uppercase; letter-spacing:1px; margin:14px 0 7px; }
+.h-list { display:flex; flex-direction:column; gap:3px; }
+.h-row { display:flex; justify-content:space-between; padding:7px 10px; border-radius:8px; background:#f1f3f6; font-size:.77rem; }
+.h-row.today { border:1.5px solid #2e7d32; background:#e8f5e9; }
+.h-day { color:#6b7280; } .h-hour { font-family:'Sora',sans-serif; font-size:.68rem; }
+.rev-list { display:flex; flex-direction:column; gap:8px; }
+.rev-card { background:#f1f3f6; border:1px solid #e2e6ed; border-radius:12px; padding:11px; position:relative; }
+.rev-top { display:flex; justify-content:space-between; margin-bottom:3px; }
+.rev-name { font-size:.8rem; font-weight:600; } .rev-stars { color:#f59e0b; font-size:.73rem; }
+.rev-date { font-size:.6rem; color:#6b7280; font-family:'Sora',sans-serif; margin-bottom:5px; }
+.rev-text { font-size:.77rem; color:#374151; line-height:1.5; padding-right:50px; }
+.rev-del { position:absolute; top:10px; right:10px; background:#fff1f1; border:1px solid rgba(220,38,38,.3); color:#dc2626; font-size:.62rem; padding:3px 7px; border-radius:6px; cursor:pointer; font-family:'Sora',sans-serif; display:none; }
+.no-revs { text-align:center; padding:20px; color:#6b7280; font-size:.8rem; }
+.btn-rev { width:100%; margin-top:10px; padding:11px; background:none; border:1.5px dashed #e2e6ed; color:#6b7280; border-radius:12px; cursor:pointer; font-family:'Inter',sans-serif; font-size:.82rem; }
+.btn-rev:hover { border-color:#2e7d32; color:#2e7d32; }
+.btn-dir { width:100%; margin-top:10px; padding:12px; background:#2e7d32; color:#fff; border:none; border-radius:12px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; font-size:.86rem; }
+
+/* MOBILE SHEET */
+@media (max-width:699px) {
+  .content { display:block; }
+  #map { position:absolute; inset:0; height:100%; }
+  .sidebar { position:absolute; bottom:0; left:0; right:0; width:100%; height:calc(100% - 50px); border-left:none; border-radius:18px 18px 0 0; box-shadow:0 -4px 24px rgba(0,0,0,.15); transform:translateY(calc(100% - 155px)); transition:transform .35s ease; z-index:50; }
+  .sidebar.up { transform:translateY(0); }
+  .sb-head { cursor:pointer; padding-top:8px; }
+  .sb-handle { width:36px; height:4px; background:#e2e6ed; border-radius:2px; margin:0 auto 8px; }
+  .btn-add { display:none; }
+  #fab { display:none; position:absolute; bottom:165px; right:14px; z-index:200; width:50px; height:50px; border-radius:50%; background:#2e7d32; color:#fff; border:none; cursor:pointer; font-size:1.4rem; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(46,125,50,.4); }
+}
+@media (min-width:700px) {
+  .sb-handle { display:none; }
+  #fab { display:none; }
+  .btn-add { display:none; }
+}
+
+/* BANNER on map */
+#map-banner { display:none; position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:400; padding:10px 18px; border-radius:100px; font-family:'Inter',sans-serif; font-weight:600; font-size:.82rem; box-shadow:0 4px 20px rgba(0,0,0,.2); white-space:nowrap; }
+#map-banner.adding { display:flex; align-items:center; gap:10px; background:#2e7d32; color:#fff; }
+#map-banner.relocating { display:flex; align-items:center; gap:10px; background:#7c3aed; color:#fff; }
+.ban-cancel { padding:3px 10px; border-radius:100px; background:rgba(255,255,255,.25); border:none; color:#fff; font-family:'Inter',sans-serif; font-size:.75rem; cursor:pointer; }
+
+/* OVERLAYS */
+.ov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9999; align-items:center; justify-content:center; padding:16px; }
+.ov.show { display:flex; }
+.modal { background:#fff; border-radius:16px; padding:22px; width:100%; max-width:440px; max-height:92vh; overflow-y:auto; box-shadow:0 16px 48px rgba(0,0,0,.2); }
+.modal.adm { border-top:3px solid #7c3aed; }
+.modal h2 { font-size:1rem; margin-bottom:3px; }
+.modal-sub { font-size:.75rem; color:#6b7280; margin-bottom:14px; }
+.fg { margin-bottom:11px; }
+.fg label { display:block; font-size:.63rem; color:#6b7280; font-family:'Sora',sans-serif; text-transform:uppercase; margin-bottom:4px; font-weight:700; }
+.fg input, .fg select, .fg textarea { width:100%; padding:10px 12px; background:#f1f3f6; border:1.5px solid #e2e6ed; border-radius:10px; color:#1a1f2e; font-family:'Inter',sans-serif; font-size:.88rem; outline:none; -webkit-appearance:none; }
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color:#2e7d32; background:#fff; }
+.fg textarea { resize:vertical; min-height:68px; }
+.frow { display:flex; gap:8px; }
+.frow .fg { flex:1; }
+.mact { display:flex; gap:8px; margin-top:14px; }
+.btn-cancel { flex:1; padding:11px; border:1.5px solid #e2e6ed; background:none; color:#6b7280; border-radius:10px; cursor:pointer; font-family:'Inter',sans-serif; }
+.btn-save { flex:2; padding:11px; border:none; background:#2e7d32; color:#fff; border-radius:10px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; }
+.btn-save.purple { background:#7c3aed; }
+.btn-delete { width:100%; padding:11px; border:1.5px solid rgba(220,38,38,.4); background:#fff1f1; color:#dc2626; border-radius:10px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; margin-top:8px; }
+.hint-blue { font-size:.7rem; color:#0277bd; padding:8px 10px; background:#e3f2fd; border:1px solid #90caf9; border-radius:8px; margin-bottom:12px; }
+.hint-purple { font-size:.7rem; color:#7c3aed; padding:8px 10px; background:#f5f3ff; border:1px solid rgba(124,58,237,.25); border-radius:8px; margin-bottom:12px; }
+.perr { font-size:.72rem; color:#dc2626; min-height:18px; margin-top:4px; }
+.pwd-field { font-family:'Sora',sans-serif !important; letter-spacing:4px !important; }
+.btn-pickmap { width:100%; padding:10px; background:#0277bd; color:#fff; border:none; border-radius:10px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; font-size:.85rem; margin-bottom:4px; display:flex; align-items:center; justify-content:center; gap:6px; }
+.btn-pickmap:active { opacity:.85; }
+.btn-pickmap.picked { background:#2e7d32; }
+.sched-wrap { display:flex; flex-direction:column; gap:6px; }
+.sched-24 { display:flex; align-items:center; gap:8px; cursor:pointer; font-size:.85rem; color:#6b7280; font-weight:500; padding:10px 14px; border-radius:10px; border:1.5px solid #e2e6ed; background:#f8fafc; transition:all .2s; user-select:none; -webkit-user-select:none; }
+.sched-24.on { border-color:#6366f1; background:#eef2ff; color:#6366f1; font-weight:600; }
+.sched-24 input[type=checkbox] { display:none; }
+.sched-times { display:flex; gap:8px; }
+.days-grid { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+.preset-btn { padding:5px 11px; border-radius:8px; border:1.5px solid #e2e6ed; background:#f8f9fa; color:#374151; font-family:'Inter',sans-serif; font-size:.78rem; font-weight:600; cursor:pointer; }
+.preset-btn:hover, .preset-btn:active { border-color:#2e7d32; background:#e8f5e9; color:#2e7d32; }
+.day-chk { display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:8px; border:1.5px solid #e2e6ed; cursor:pointer; font-size:.78rem; font-weight:500; color:#6b7280; user-select:none; -webkit-user-select:none; }
+.day-chk input[type=checkbox] { display:none; }
+.day-chk.checked { border-color:#c62828; background:#ffebee; color:#c62828; font-weight:700; }
+.sched-times .fg { flex:1; margin-bottom:0; }
+.star-pick { display:flex; gap:8px; margin-top:4px; }
+.sp { font-size:1.7rem; cursor:pointer; color:#f59e0b; opacity:.2; }
+.sp.on { opacity:1; }
+
+.prof-tab { flex:1; padding:8px 14px; border-radius:8px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#94a3b8; font-family:'Inter',sans-serif; font-size:.82rem; font-weight:600; cursor:pointer; }
+.prof-tab.on { background:#6366f1; color:#fff; border-color:#6366f1; }
+
+/* AVATAR */
+.avatar-upload-wrap { display:flex; align-items:center; gap:14px; margin-bottom:16px; padding:14px; background:#f8fafc; border-radius:14px; border:1.5px dashed #e2e8f0; }
+.avatar-preview { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#fff; font-weight:700; overflow:hidden; flex-shrink:0; border:3px solid #fff; box-shadow:0 2px 8px rgba(99,102,241,.3); }
+.avatar-preview img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+.avatar-upload-info { flex:1; min-width:0; }
+.avatar-upload-info p { font-size:.82rem; font-weight:600; color:#1a1f2e; margin-bottom:2px; }
+.avatar-upload-info span { font-size:.72rem; color:#94a3b8; }
+.btn-upload-av { display:inline-block; margin-top:7px; padding:7px 14px; border-radius:8px; border:1.5px solid #6366f1; background:#fff; color:#6366f1; font-family:'Inter',sans-serif; font-size:.78rem; font-weight:600; cursor:pointer; white-space:nowrap; }
+
+/* Leaflet popup */
+.leaflet-popup-content-wrapper { background:#fff !important; border:1px solid #e2e6ed !important; border-radius:14px !important; color:#1a1f2e !important; font-family:'Inter',sans-serif !important; box-shadow:0 8px 32px rgba(0,0,0,.15) !important; }
+.leaflet-popup-tip { background:#fff !important; }
+.leaflet-popup-content { margin:0 !important; }
+.pop-inner { padding:13px 15px; min-width:200px; }
+.pop-type { font-size:.62rem; font-family:'Sora',sans-serif; font-weight:700; margin-bottom:3px; }
+.pop-name { font-size:.9rem; font-weight:700; margin-bottom:2px; }
+.pop-addr { font-size:.72rem; color:#6b7280; margin-bottom:8px; }
+.pop-pills { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:9px; }
+.pop-btn { width:100%; padding:9px; background:#2e7d32; color:#fff; border:none; border-radius:9px; font-family:'Inter',sans-serif; font-weight:700; font-size:.8rem; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<!-- ═══ AUTH ═══ -->
+<div id="auth">
+  <div class="a-wrap">
+    <div class="a-logo">
+      <div class="a-icon"><svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Wheels -->
+  <circle cx="12" cy="36" r="9" stroke="rgba(255,255,255,0.95)" stroke-width="3" fill="none"/>
+  <circle cx="40" cy="36" r="9" stroke="rgba(255,255,255,0.95)" stroke-width="3" fill="none"/>
+  <circle cx="12" cy="36" r="2.5" fill="white"/>
+  <circle cx="40" cy="36" r="2.5" fill="white"/>
+  <!-- Frame -->
+  <path d="M12 36 L22 19 L40 36" stroke="#fde68a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M22 19 L31 36" stroke="#fde68a" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Fork -->
+  <path d="M27 19 L40 19 L40 36" stroke="#fbcfe8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Seat -->
+  <path d="M19 19 L25 19" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <!-- Handlebar -->
+  <path d="M37 19 L43 19" stroke="white" stroke-width="3" stroke-linecap="round"/>
+  <line x1="40" y1="16.5" x2="40" y2="20" stroke="white" stroke-width="3" stroke-linecap="round"/>
+</svg></div>
+      <div class="a-title">Park<span>Bike</span></div>
+      <div class="a-sub">Parkings para bicicletas y monopatines</div>
+    </div>
+    <div class="a-card">
+      <div class="a-tabs">
+        <button class="a-tab on" id="tab-login-btn" onclick="switchTab('login')">Ingresar</button>
+        <button class="a-tab" id="tab-reg-btn" onclick="switchTab('register')">Registrarse</button>
+      </div>
+      <!-- LOGIN -->
+      <div id="tab-login">
+        <div class="a-field"><label>Email</label><input type="email" id="l-email" placeholder="tu@email.com" autocomplete="username" autocorrect="off" autocapitalize="none"></div>
+        <div class="a-field"><label>Contraseña</label><input type="password" id="l-pwd" placeholder="••••••••" autocomplete="current-password"></div>
+        <div class="a-err" id="l-err"></div>
+        <button class="a-btn" onclick="doLogin()">Entrar →</button>
+        <div class="a-note">¿No tenés cuenta? Tocá Registrarse.<br><span class="a-demo" style="cursor:pointer;text-decoration:underline;" onclick="fillDemo()">▶ Entrar con cuenta demo</span></div>
+      </div>
+      <!-- REGISTER -->
+      <div id="tab-reg" style="display:none">
+        <div class="frow" style="display:flex;gap:8px;">
+          <div class="a-field" style="flex:1"><label>Nombre *</label><input type="text" id="r-name" placeholder="Tu nombre" autocomplete="given-name" autocapitalize="words"></div>
+          <div class="a-field" style="flex:1"><label>Apellido</label><input type="text" id="r-lastname" placeholder="Opcional" autocomplete="family-name" autocapitalize="words"></div>
+        </div>
+        <div class="a-field"><label>Email *</label><input type="email" id="r-email" placeholder="tu@email.com" autocomplete="username" autocorrect="off" autocapitalize="none"></div>
+        <div class="a-field"><label>Contraseña *</label><input type="password" id="r-pwd" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
+        <div class="a-field"><label>Fecha de nacimiento</label><input type="date" id="r-dob" style="width:100%"></div>
+        <div class="a-field">
+          <label>¿Qué vehículo usás?</label>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;">
+              <input type="checkbox" id="r-bike" style="width:16px;height:16px;accent-color:#2e7d32;"> 🚲 Bicicleta
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;">
+              <input type="checkbox" id="r-ebike" style="width:16px;height:16px;accent-color:#2e7d32;"> ⚡ Bicicleta eléctrica
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;">
+              <input type="checkbox" id="r-scooter" style="width:16px;height:16px;accent-color:#0277bd;"> 🛴 Monopatín
+            </label>
+          </div>
+        </div>
+        <div class="a-err" id="r-err"></div>
+        <button class="a-btn" onclick="doRegister()">Crear cuenta →</button>
+        <div class="a-note">Al registrarte podés escribir opiniones sobre cada parking.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-logo">
+      <div class="hdr-icon">🚲</div>
+      <div class="hdr-name">Park<span>Bike</span></div>
+    </div>
+    <div class="hdr-right">
+      <div class="user-chip" onclick="openProfile()" style="cursor:pointer;" title="Mi perfil">
+        <div class="user-av" id="user-av">?</div>
+        <div class="user-nm" id="user-nm">Usuario</div>
+        <button class="btn-out" onclick="event.stopPropagation();doLogout()" title="Salir">✕</button>
+      </div>
+      <button class="btn-add" id="btn-add" onclick="startAdd()">＋ Agregar parking</button>
+      <button class="btn-adm" id="btn-adm" onclick="toggleAdmin()">⚙ Admin</button>
+    </div>
+  </div>
+  <!-- Admin bar -->
+  <div class="adm-bar" id="adm-bar">
+    <div class="adm-dot"></div>
+    <span>Modo administrador activo — podés gestionar los parkings</span>
+    <div class="adm-right">
+      <button class="adm-btn" onclick="openOv('ov-chpwd')">🔑 Cambiar contraseña</button>
+      <button class="adm-btn red" onclick="logoutAdmin()">Salir</button>
+    </div>
+  </div>
+  <!-- Search -->
+  <div class="search-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Buscar parking por nombre o barrio…" oninput="onSearch(this.value)" autocomplete="off" autocorrect="off" autocapitalize="none">
+      <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
+    </div>
+  </div>
+  <!-- Filters -->
+  <div class="filters">
+    <button class="fbtn f-bike" id="f-bike" onclick="toggleFilter('bike',this)"><span class="fdot" style="background:#2e7d32"></span>Bicicletas</button>
+    <button class="fbtn f-scooter" id="f-scooter" onclick="toggleFilter('scooter',this)"><span class="fdot" style="background:#0277bd"></span>Monopatines</button>
+    <button class="fbtn f-both" id="f-both" onclick="toggleFilter('both',this)"><span class="fdot" style="background:#e65100"></span>Ambos</button>
+    <button class="fav-filter" id="f-favs" onclick="toggleFavFilter()">⭐ Favoritos</button>
+    <button class="fbtn" id="f-cycleways" onclick="toggleCycleways()"><span class="fdot" style="background:#22c55e"></span>Ciclovías</button>
+  </div>
+  <!-- Content -->
+  <div class="content">
+    <div style="position:relative;flex:1;min-height:0;height:100%;display:flex;flex-direction:column;">
+      <div id="map"></div>
+      <div id="map-banner">
+        <span id="ban-txt"></span>
+        <button class="ban-cancel" id="ban-cancel">✕ Cancelar</button>
+      </div>
+      <button id="fab" onclick="startAdd()">＋</button>
+    </div>
+    <div class="sidebar" id="sidebar">
+      <div class="sb-handle"></div>
+      <div class="sb-head" onclick="toggleSheet()">
+        <div class="sb-title">📍 Parkings en Montevideo</div>
+        <div class="sb-count" id="sb-count">Cargando…</div>
+      </div>
+      <div class="park-list" id="park-list"></div>
+      <!-- Detail -->
+      <div class="detail" id="detail">
+        <div class="det-hdr">
+          <button class="det-back" onclick="closeDetail()">← Volver</button>
+          <div class="det-title" id="det-title"></div>
+          <button class="det-edit" id="det-edit" onclick="openEdit(curId)">✏️ Editar</button>
+        </div>
+        <div class="det-body" id="det-body"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- USER PROFILE -->
+<div class="ov" id="ov-profile">
+  <div class="modal" style="border-top:3px solid #6366f1;">
+    <h2>👤 Mi perfil</h2>
+    <p class="modal-sub" id="profile-email-lbl"></p>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="display:flex;gap:6px;">
+        <button class="prof-tab on" id="ptab-data" onclick="switchProfTab('data')">Mis datos</button>
+        <button class="prof-tab" id="ptab-favs" onclick="switchProfTab('favs')">⭐ Favoritos</button>
+        <button class="prof-tab" id="ptab-pwd" onclick="switchProfTab('pwd')">Contraseña</button>
+      </div>
+          </div>
+    <!-- DATOS -->
+    <div id="prof-data">
+      <div class="avatar-upload-wrap">
+        <div class="avatar-preview" id="prof-av-preview">?</div>
+        <div class="avatar-upload-info">
+          <p>Foto de perfil</p>
+          <span>JPG o PNG, máx 2MB</span><br>
+          <button class="btn-upload-av" onclick="el('av-file-input').click()">📷 Cambiar foto</button>
+          <input type="file" id="av-file-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Nombre *</label><input type="text" id="p-name" placeholder="Tu nombre" autocapitalize="words"></div>
+        <div class="fg"><label>Apellido</label><input type="text" id="p-lastname" placeholder="Opcional" autocapitalize="words"></div>
+      </div>
+      <div class="fg"><label>Fecha de nacimiento</label><input type="date" id="p-dob" style="width:100%"></div>
+      <div class="fg">
+        <label>¿Qué vehículo usás?</label>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;padding:9px 12px;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;">
+            <input type="checkbox" id="p-bike" style="width:16px;height:16px;accent-color:#6366f1;"> 🚲 Bicicleta
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;padding:9px 12px;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;">
+            <input type="checkbox" id="p-ebike" style="width:16px;height:16px;accent-color:#6366f1;"> ⚡ Bicicleta eléctrica
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;padding:9px 12px;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;">
+            <input type="checkbox" id="p-scooter" style="width:16px;height:16px;accent-color:#0277bd;"> 🛴 Monopatín
+          </label>
+        </div>
+      </div>
+      <div class="perr" id="p-err"></div>
+      <div class="mact">
+        <button class="btn-cancel" onclick="closeOv('ov-profile')">Cancelar</button>
+        <button class="btn-save" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);" onclick="saveProfile()">Guardar cambios</button>
+      </div>
+    </div>
+    <!-- FAVORITOS -->
+    <div id="prof-favs" style="display:none;">
+      <div id="prof-favs-list"></div>
+    </div>
+
+    <!-- CONTRASEÑA -->
+    <div id="prof-pwd" style="display:none;">
+      <div class="fg"><label>Contraseña actual</label><input class="pwd-field" type="password" id="p-old-pwd" placeholder="••••••••"></div>
+      <div class="fg"><label>Nueva contraseña</label><input class="pwd-field" type="password" id="p-new-pwd" placeholder="Mínimo 6 caracteres"></div>
+      <div class="fg"><label>Repetir nueva contraseña</label><input class="pwd-field" type="password" id="p-rep-pwd" placeholder="••••••••"></div>
+      <div class="perr" id="p-pwd-err"></div>
+      <div class="mact">
+        <button class="btn-cancel" onclick="closeOv('ov-profile')">Cancelar</button>
+        <button class="btn-save" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);" onclick="saveProfilePwd()">Cambiar contraseña</button>
+      </div>
+    </div>
+    <button onclick="closeOv('ov-profile');doLogout();" style="width:100%;margin-top:16px;padding:12px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#6b7280;border-radius:12px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:.88rem;">🚪 Cerrar sesión</button>
+  </div>
+</div>
+<div class="ov" id="ov-adm-login">
+  <div class="modal adm">
+    <h2>🔐 Acceso administrador</h2>
+    <p class="modal-sub">Ingresá la contraseña para activar el modo edición.</p>
+    <div class="fg"><label>Contraseña</label><input class="pwd-field" type="password" id="adm-pwd" placeholder="••••••••"></div>
+    <div class="perr" id="adm-pwd-err"></div>
+    <div class="mact">
+      <button class="btn-cancel" onclick="closeOv('ov-adm-login')">Cancelar</button>
+      <button class="btn-save purple" onclick="checkAdminPwd()">Ingresar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD -->
+<div class="ov" id="ov-chpwd">
+  <div class="modal adm">
+    <h2>🔑 Cambiar contraseña admin</h2>
+    <p class="modal-sub">Actualiza la contraseña de administrador.</p>
+    <div class="fg"><label>Contraseña actual</label><input class="pwd-field" type="password" id="cp-old" placeholder="••••••••"></div>
+    <div class="fg"><label>Nueva contraseña</label><input class="pwd-field" type="password" id="cp-new" placeholder="Mínimo 6 caracteres"></div>
+    <div class="fg"><label>Repetir contraseña</label><input class="pwd-field" type="password" id="cp-rep" placeholder="••••••••"></div>
+    <div class="perr" id="cp-err"></div>
+    <div class="mact">
+      <button class="btn-cancel" onclick="closeOv('ov-chpwd')">Cancelar</button>
+      <button class="btn-save purple" onclick="changePassword()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PARK -->
+<div class="ov" id="ov-add">
+  <div class="modal">
+    <h2>Nuevo parking</h2>
+    <p class="modal-sub">Completá los datos del nuevo parking.</p>
+    <button class="btn-pickmap" id="btn-pickmap" onclick="pickOnMap()">📍 Tocar el mapa para ubicar</button>
+    <div class="hint-blue" id="add-hint" style="display:none"></div>
+    <div class="fg"><label>Nombre</label><input type="text" id="n-name" placeholder="Ej: Rack Plaza Cagancha"></div>
+    <div class="fg"><label>Dirección</label><input type="text" id="n-addr" placeholder="Calle y número, barrio"></div>
+    <div class="frow">
+      <div class="fg"><label>Tipo</label>
+        <select id="n-type">
+          <option value="bike">🚲 Bicicletas</option>
+          <option value="scooter">🛴 Monopatines</option>
+          <option value="both">🚲🛴 Ambos</option>
+        </select>
+      </div>
+      <div class="fg"><label>Cobertura</label>
+        <div style="display:flex;gap:8px;margin-top:6px;">
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e6ed;cursor:pointer;font-size:.85rem;font-weight:500;" id="n-covered-yes">
+            <input type="radio" name="n-covered-opt" value="yes" onchange="el('n-covered').checked=true"> ☂️ Cubierto
+          </label>
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e6ed;cursor:pointer;font-size:.85rem;font-weight:500;" id="n-covered-no">
+            <input type="radio" name="n-covered-opt" value="no" checked onchange="el('n-covered').checked=false"> 🌤️ Descubierto
+          </label>
+        </div>
+        <input type="checkbox" id="n-covered" style="display:none">
+      </div>
+    </div>
+    <div class="fg">
+      <label>Horario</label>
+      <div class="sched-wrap">
+        <label class="sched-24" id="n-24h-label" onclick="toggle24('n')"><input type="checkbox" id="n-24h"> ⏰ Abierto 24 horas / todos los días</label>
+        <div id="n-times">
+          <div class="sched-times">
+            <div class="fg"><label>Abre</label><input type="time" id="n-open" value="08:00"></div>
+            <div class="fg"><label>Cierra</label><input type="time" id="n-close" value="22:00"></div>
+          </div>
+          <div class="fg" style="margin-top:8px">
+            <label>Días cerrado (opcional)</label>
+            <div class="days-grid" id="n-days">
+              <div class="day-chk" onclick="toggleDay(this)">Dom<input type="checkbox" value="0"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Lun<input type="checkbox" value="1"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Mar<input type="checkbox" value="2"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Mié<input type="checkbox" value="3"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Jue<input type="checkbox" value="4"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Vie<input type="checkbox" value="5"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Sáb<input type="checkbox" value="6"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+        <div class="fg">
+      <label>Costo</label>
+      <input type="text" id="n-cost" placeholder="Ej: 15/hora  ·  50/día  ·  Gratis">
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;">
+        <button type="button" class="preset-btn" onclick="el('n-cost').value='Gratuito'">Gratis</button>
+        <button type="button" class="preset-btn" onclick="el('n-cost').value='15/hora'">$15/h</button>
+        <button type="button" class="preset-btn" onclick="el('n-cost').value='20/hora'">$20/h</button>
+        <button type="button" class="preset-btn" onclick="el('n-cost').value='30/hora'">$30/h</button>
+        <button type="button" class="preset-btn" onclick="el('n-cost').value='50/hora'">$50/h</button>
+        <button type="button" class="preset-btn" onclick="el('n-cost').value='100/hora'">$100/h</button>
+        <button type="button" class="preset-btn" onclick="el('n-cost').value='200/hora'">$200/h</button>
+      </div>
+    </div>
+    <div class="fg"><label>Teléfono (opcional)</label><input type="tel" id="n-phone" placeholder="Ej: 099 123 456" inputmode="tel"></div>
+    <div class="fg"><label>Web / Instagram / Facebook</label><input type="text" id="n-url" placeholder="https://instagram.com/miparking" autocorrect="off" autocapitalize="none"></div>
+    <div class="frow">
+      <div class="fg"><label>Latitud</label><input type="number" id="n-lat" placeholder="-34.9058" step="0.0001"></div>
+      <div class="fg"><label>Longitud</label><input type="number" id="n-lng" placeholder="-56.1913" step="0.0001"></div>
+    </div>
+    <div class="mact">
+      <button class="btn-cancel" onclick="cancelAdd()">Cancelar</button>
+      <button class="btn-save" onclick="saveNew()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PARK -->
+<div class="ov" id="ov-edit">
+  <div class="modal adm">
+    <h2>✏️ Editar parking</h2>
+    <p class="modal-sub">Modificá los datos del parking.</p>
+    <input type="hidden" id="e-id">
+    <div class="fg"><label>Nombre</label><input type="text" id="e-name"></div>
+    <div class="fg"><label>Dirección</label><input type="text" id="e-addr"></div>
+    <div class="frow">
+      <div class="fg"><label>Tipo</label>
+        <select id="e-type">
+          <option value="bike">🚲 Bicicletas</option>
+          <option value="scooter">🛴 Monopatines</option>
+          <option value="both">🚲🛴 Ambos</option>
+        </select>
+      </div>
+      <div class="fg"><label>Cobertura</label>
+        <div style="display:flex;gap:8px;margin-top:6px;">
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e6ed;cursor:pointer;font-size:.85rem;font-weight:500;">
+            <input type="radio" name="e-covered-opt" value="yes" onchange="el('e-covered').checked=true"> ☂️ Cubierto
+          </label>
+          <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e6ed;cursor:pointer;font-size:.85rem;font-weight:500;">
+            <input type="radio" name="e-covered-opt" value="no" onchange="el('e-covered').checked=false"> 🌤️ Descubierto
+          </label>
+        </div>
+        <input type="checkbox" id="e-covered" style="display:none">
+      </div>
+    </div>
+    <div class="fg">
+      <label>Horario</label>
+      <div class="sched-wrap">
+        <label class="sched-24" id="e-24h-label" onclick="toggle24('e')"><input type="checkbox" id="e-24h"> ⏰ Abierto 24 horas / todos los días</label>
+        <div id="e-times">
+          <div class="sched-times">
+            <div class="fg"><label>Abre</label><input type="time" id="e-open" value="08:00"></div>
+            <div class="fg"><label>Cierra</label><input type="time" id="e-close" value="22:00"></div>
+          </div>
+          <div class="fg" style="margin-top:8px">
+            <label>Días cerrado (opcional)</label>
+            <div class="days-grid" id="e-days">
+              <div class="day-chk" onclick="toggleDay(this)">Dom<input type="checkbox" value="0"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Lun<input type="checkbox" value="1"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Mar<input type="checkbox" value="2"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Mié<input type="checkbox" value="3"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Jue<input type="checkbox" value="4"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Vie<input type="checkbox" value="5"></div>
+              <div class="day-chk" onclick="toggleDay(this)">Sáb<input type="checkbox" value="6"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+        <div class="fg">
+      <label>Costo</label>
+      <input type="text" id="e-cost" placeholder="Ej: 15/hora  ·  50/día  ·  Gratis">
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;">
+        <button type="button" class="preset-btn" onclick="el('e-cost').value='Gratuito'">Gratis</button>
+        <button type="button" class="preset-btn" onclick="el('e-cost').value='15/hora'">$15/h</button>
+        <button type="button" class="preset-btn" onclick="el('e-cost').value='20/hora'">$20/h</button>
+        <button type="button" class="preset-btn" onclick="el('e-cost').value='30/hora'">$30/h</button>
+        <button type="button" class="preset-btn" onclick="el('e-cost').value='50/hora'">$50/h</button>
+        <button type="button" class="preset-btn" onclick="el('e-cost').value='100/hora'">$100/h</button>
+        <button type="button" class="preset-btn" onclick="el('e-cost').value='200/hora'">$200/h</button>
+      </div>
+    </div>
+    <div class="fg"><label>Teléfono (opcional)</label><input type="tel" id="e-phone" placeholder="Ej: 099 123 456" inputmode="tel"></div>
+    <div class="fg"><label>Web / Instagram / Facebook</label><input type="text" id="e-url" placeholder="https://instagram.com/miparking" autocorrect="off" autocapitalize="none"></div>
+    <div class="hint-purple">📍 Para mover la ubicación en el mapa usá el botón "Reubicar" en la tarjeta.</div>
+    <div class="mact">
+      <button class="btn-cancel" onclick="closeOv('ov-edit')">Cancelar</button>
+      <button class="btn-save purple" onclick="saveEdit()">Guardar cambios</button>
+    </div>
+    <button class="btn-delete" onclick="deletePark(parseInt(document.getElementById('e-id').value))">🗑 Eliminar este parking</button>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div class="ov" id="ov-rev">
+  <div class="modal">
+    <h2>Escribir opinión</h2>
+    <p class="modal-sub">Compartí tu experiencia con este parking.</p>
+    <div class="fg"><label>Tu nombre</label><input type="text" id="rv-name" placeholder="Ej: María G."></div>
+    <div class="fg"><label>Valoración</label>
+      <div class="star-pick">
+        <span class="sp" onclick="pickStar(1)">★</span>
+        <span class="sp" onclick="pickStar(2)">★</span>
+        <span class="sp" onclick="pickStar(3)">★</span>
+        <span class="sp" onclick="pickStar(4)">★</span>
+        <span class="sp" onclick="pickStar(5)">★</span>
+      </div>
+    </div>
+    <div class="fg"><label>Comentario</label><textarea id="rv-text" placeholder="¿Es seguro, fácil de encontrar, bien señalizado...?"></textarea></div>
+    <div class="mact">
+      <button class="btn-cancel" onclick="closeOv('ov-rev')">Cancelar</button>
+      <button class="btn-save" onclick="saveRev()">Publicar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+var ADMIN_PWD = 'parkbike2025';
+var users = JSON.parse(localStorage.getItem('users')) || [];
+// Ensure demo user always exists
+var demoExists = false;
+for (var _di = 0; _di < users.length; _di++) { if (users[_di].email === 'demo@parkbike.uy') { demoExists = true; break; } }
+if (!demoExists) users.unshift({name:'Demo', email:'demo@parkbike.uy', pwd:'demo123'});
+var currentUser = null;
+var isAdmin = false;
+var filters = {bike:true, scooter:true, both:true};
+var selId = null;
+var curId = null;
+var nxtId = 500;
+var revTarget = null;
+var selStars = 0;
+var searchQuery = '';
+var addingMode = false;
+var relocating = false;
+var relocId = null;
+var tmpMkr = null;
+var pendingLat = null;
+var pendingLng = null;
+var sheetUp = false;
+var mapReady = false;
+var leafMap = null;
+var mkrs = {};
+var H = new Date().getHours();
+var TODAY = new Date().getDay();
+var DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+var parks = JSON.parse(localStorage.getItem('parks')) || [
+  {id:1, name:'Bicicletario Palacio Municipal (18 de Julio)', addr:'Av. 18 de Julio 1360, Centro', type:'bike', lat:-34.9054, lng:-56.1888, cost:'Gratuito', schedule:'08:00-16:00', phone:'1950', url:'https://montevideo.gub.uy', covered:false,
+   reviews:[{name:'Rodrigo T.',rating:5,text:'Perfecto para trámites en la IM. 52 lugares bien señalizados.',date:Date.now()-86400000*3},{name:'Valeria M.',rating:4,text:'Cómodo. El del atrio de Soriano está hasta las 20hs.',date:Date.now()-86400000*10}]},
+  {id:2, name:'Bicicletario Palacio Municipal (Soriano)', addr:'Soriano 1346, Centro', type:'bike', lat:-34.9048, lng:-56.1878, cost:'Gratuito', schedule:'10:00-20:00', phone:'', url:'', covered:false,
+   reviews:[{name:'Federico L.',rating:4,text:'Entrada por Soriano, ideal si vas al mirador.',date:Date.now()-86400000*5}]},
+  {id:3, name:'Rack Plaza Independencia', addr:'Plaza Independencia s/n, Ciudad Vieja', type:'both', lat:-34.9063, lng:-56.1913, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Juan P.',rating:5,text:'Excelente ubicación. Siempre hay lugar.',date:Date.now()-86400000*2},{name:'Laura M.',rating:4,text:'Práctico. Le falta techo para la lluvia.',date:Date.now()-86400000*8}]},
+  {id:4, name:'Rack Peatonal Sarandí', addr:'Sarandí 500, Ciudad Vieja', type:'bike', lat:-34.9076, lng:-56.2045, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Camila R.',rating:5,text:'Ideal para recorrer Ciudad Vieja. Muy seguro.',date:Date.now()-86400000*1}]},
+  {id:5, name:'Bicicletario Mercado del Puerto', addr:'Pérez Castellanos 1618, Ciudad Vieja', type:'bike', lat:-34.9087, lng:-56.2134, cost:'30/hora', schedule:'08:00-20:00', phone:'092 345 678', url:'https://instagram.com/bicicletariomvd', covered:true,
+   reviews:[{name:'Sofía R.',rating:3,text:'Algo caro pero bien ubicado.',date:Date.now()-86400000*5},{name:'Martín A.',rating:4,text:'El encargado es amable.',date:Date.now()-86400000*12}]},
+  {id:6, name:'Rack Torre Telecomunicaciones', addr:'Guatemala 1075, Ciudad Vieja', type:'both', lat:-34.9060, lng:-56.2080, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Pablo S.',rating:4,text:'Bien ubicado cerca del puerto y museos.',date:Date.now()-86400000*7}]},
+  {id:7, name:'Rack Plaza Cagancha', addr:'Plaza Cagancha, Centro', type:'both', lat:-34.9045, lng:-56.1850, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Andrés F.',rating:4,text:'En el corazón del centro.',date:Date.now()-86400000*4}]},
+  {id:8, name:'Rack Ciclovía 18 de Julio', addr:'Av. 18 de Julio 1200, Centro', type:'bike', lat:-34.9056, lng:-56.1935, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Nicolás B.',rating:5,text:'La ciclovía de 18 de Julio es fantástica.',date:Date.now()-86400000*2}]},
+  {id:9, name:'Bicicletario Facultad de Derecho', addr:'Av. 18 de Julio 1824, Centro', type:'bike', lat:-34.9050, lng:-56.1822, cost:'Gratuito', schedule:'07:00-22:00', phone:'2400 0466', url:'https://fder.edu.uy', covered:false,
+   reviews:[{name:'Camila T.',rating:5,text:'Muchos lugares. Ideal para todo el día.',date:Date.now()-86400000*6}]},
+  {id:10, name:'Rack Palacio Legislativo', addr:'Av. de las Leyes 1, Aguada', type:'both', lat:-34.8998, lng:-56.1848, cost:'Gratuito', schedule:'07:00-22:00', phone:'', url:'', covered:false,
+   reviews:[{name:'Roberto S.',rating:4,text:'Bien cuidado. Buena opción.',date:Date.now()-86400000*20}]},
+  {id:11, name:'Bicicletario ANTEL Arena', addr:'Av. Luis Batlle Berres 1900, La Teja', type:'both', lat:-34.8901, lng:-56.2218, cost:'Gratuito', schedule:'10:00-22:00', phone:'2900 0000', url:'https://instagram.com/antelarena', covered:true,
+   reviews:[{name:'Marcos V.',rating:4,text:'Enorme capacidad para eventos.',date:Date.now()-86400000*15}]},
+  {id:12, name:'Rack Terminal Tres Cruces', addr:'Av. Italia 1550, Tres Cruces', type:'both', lat:-34.8983, lng:-56.1716, cost:'Gratuito', schedule:'06:00-23:00', phone:'2401 8998', url:'https://www.trescruces.com.uy', covered:false,
+   reviews:[{name:'Pablo G.',rating:5,text:'Ideal para combinar bici con ómnibus.',date:Date.now()-86400000*4},{name:'Diego F.',rating:3,text:'Lleno en hora pico.',date:Date.now()-86400000*15}]},
+  {id:13, name:'Rack Shopping Montevideo', addr:'Av. L.A. de Herrera 1290, Pocitos', type:'bike', lat:-34.9010, lng:-56.1555, cost:'Gratuito', schedule:'10:00-22:00', phone:'2622 6444', url:'https://www.shoppingmontevideo.com.uy', covered:true,
+   reviews:[{name:'Florencia K.',rating:4,text:'Dentro del shopping, cubierto.',date:Date.now()-86400000*6}]},
+  {id:14, name:'Estación Bici Rambla Pocitos', addr:'Rambla Rep. del Perú 4200, Pocitos', type:'bike', lat:-34.9087, lng:-56.1411, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Carlos V.',rating:5,text:'Perfecto para ir en bici por la rambla.',date:Date.now()-86400000*1}]},
+  {id:15, name:'Rack Rambla Pocitos (Benito Blanco)', addr:'Rambla Rep. del Perú 3600, Pocitos', type:'both', lat:-34.9120, lng:-56.1520, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Sebastián D.',rating:5,text:'Vista al mar espectacular.',date:Date.now()-86400000*3}]},
+  {id:16, name:'Rack Rambla Sur', addr:'Rambla Sur 1200, Barrio Sur', type:'bike', lat:-34.9124, lng:-56.1752, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Ignacio R.',rating:5,text:'Frente al mar. Arranque perfecto.',date:Date.now()-86400000*3}]},
+  {id:17, name:'Rack Parque Rodó', addr:'Av. Sarmiento 2690, Parque Rodó', type:'bike', lat:-34.9179, lng:-56.1627, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Florencia M.',rating:5,text:'Perfecto para ir al parque.',date:Date.now()-86400000*7}]},
+  {id:18, name:'Rack Punta Carretas Shopping', addr:'Ellauri 350, Punta Carretas', type:'both', lat:-34.9213, lng:-56.1398, cost:'Gratuito', schedule:'10:00-22:00', phone:'2711 8888', url:'https://www.puntacarretas.com.uy', covered:true,
+   reviews:[{name:'Natalia G.',rating:4,text:'Cubierto y seguro.',date:Date.now()-86400000*1}]},
+  {id:19, name:'Rack Scooter 21 de Setiembre', addr:'21 de Setiembre 2400, Pocitos', type:'scooter', lat:-34.9143, lng:-56.1519, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Tomás W.',rating:3,text:'Poca capacidad. Casi siempre lleno.',date:Date.now()-86400000*2}]},
+  {id:20, name:'Rack Rambla Malvín', addr:'Rambla Tomás Berreta 4800, Malvín', type:'bike', lat:-34.8963, lng:-56.1001, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Andrea C.',rating:5,text:'Poco congestionado. Muy tranquilo.',date:Date.now()-86400000*5}]},
+  {id:21, name:'Bicicletario Parque Batlle', addr:'Av. Ricaldoni s/n, Parque Batlle', type:'bike', lat:-34.8982, lng:-56.1524, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Ramiro P.',rating:4,text:'Parque grande con buen acceso.',date:Date.now()-86400000*8}]},
+  {id:22, name:'Rack Rambla Carrasco', addr:'Rambla L.B. Pacheco 6500, Carrasco', type:'bike', lat:-34.8752, lng:-55.9980, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
+   reviews:[{name:'Valentina S.',rating:5,text:'Zona tranquila. Ideal para paseos largos.',date:Date.now()-86400000*12}]},
+  {id:23, name:'SurPark Bici Cubierto', addr:'Colonia 1200, Centro', type:'bike', lat:-34.9045, lng:-56.1870, cost:'50/hora', schedule:'08:00-20:00', phone:'095 112 233', url:'https://instagram.com/surparkmvd', covered:true,
+   reviews:[{name:'Andrea P.',rating:4,text:'Muy seguro. Tranquilidad para todo el día.',date:Date.now()-86400000*2}]},
+  {id:24, name:'Bicicletario LATU', addr:'Av. Italia 6201, Buceo', type:'bike', lat:-34.8901, lng:-56.1100, cost:'Gratuito', schedule:'08:00-18:00', phone:'2601 3724', url:'https://latu.org.uy', covered:false,
+   reviews:[{name:'Marcela F.',rating:4,text:'Seguro y funcional.',date:Date.now()-86400000*10}]},
+  {id:25, name:'Rack Hospital de Clínicas', addr:'Av. Italia 2870, Centro', type:'bike', lat:-34.8929, lng:-56.1571, cost:'Gratuito', schedule:'24h', phone:'2480 8020', url:'https://clinicas.hospital.edu.uy', covered:false,
+   reviews:[{name:'Diego R.',rating:3,text:'Funcional pero podría estar mejor.',date:Date.now()-86400000*20}]}
+];
+
+// ═══════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════
+function isOpen(s) {
+  if (s === '24h') return true;
+  try {
+    // Format: "HH:MM-HH:MM" or "HH:MM-HH:MM|closedDays"
+    var pipeIdx = s.indexOf('|');
+    var timePart = pipeIdx > -1 ? s.substring(0, pipeIdx) : s;
+    var closedDays = pipeIdx > -1 ? s.substring(pipeIdx + 1).split(',').map(Number) : [];
+    // Check if today is a closed day
+    var todayNum = new Date().getDay();
+    if (closedDays.indexOf(todayNum) > -1) return false;
+    // Check time range
+    var parts = timePart.split('-');
+    var oh = parseInt(parts[0].split(':')[0], 10);
+    var om = parseInt(parts[0].split(':')[1] || '0', 10);
+    var ch = parseInt(parts[1].split(':')[0], 10);
+    var cm = parseInt(parts[1].split(':')[1] || '0', 10);
+    var now = new Date().getHours() * 60 + new Date().getMinutes();
+    var openMin = oh * 60 + om;
+    var closeMin = ch * 60 + cm;
+    return closeMin > openMin ? (now >= openMin && now < closeMin) : (now >= openMin || now < closeMin);
+  } catch(e) { return true; }
+}
+function avgR(revs) {
+  if (!revs.length) return null;
+  return (revs.reduce(function(a, r) { return a + r.rating; }, 0) / revs.length).toFixed(1);
+}
+function fmtDate(ts) {
+  return new Date(ts).toLocaleDateString('es-UY', {day:'numeric', month:'short', year:'numeric'});
+}
+var DAY_NAMES_SHORT = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+function hlbl(s) {
+  if (s === '24h') return 'Abierto 24 hs';
+  var pipeIdx = s.indexOf('|');
+  var timePart = pipeIdx > -1 ? s.substring(0, pipeIdx) : s;
+  var parts = timePart.split('-');
+  var timeStr = (parts[0] || '08:00') + ' – ' + (parts[1] || '22:00');
+  if (pipeIdx > -1) {
+    var closed = s.substring(pipeIdx + 1).split(',').map(Number);
+    var names = closed.map(function(d) { return DAY_NAMES_SHORT[d]; });
+    return timeStr + ' (cierra ' + names.join(', ') + ')';
+  }
+  return timeStr;
+}
+function dcost(c) {
+  if (!c) return '🟢 Gratuito';
+  var l = c.toLowerCase();
+  if (l === 'gratuito' || l === 'gratis' || l === 'free') return '🟢 Gratuito';
+  // Strip any leading $ the user may have typed, then add $ consistently
+  var clean = c.replace(/^\$+/, '');
+  return '💲 $' + clean;
+}
+function urlIcon(u) {
+  if (u.indexOf('instagram') > -1) return '📸';
+  if (u.indexOf('facebook') > -1) return '👤';
+  return '🌐';
+}
+function urlLabel(u) {
+  if (u.indexOf('instagram') > -1) return 'Instagram';
+  if (u.indexOf('facebook') > -1) return 'Facebook';
+  return 'Sitio web';
+}
+function urlShort(u) {
+  return u.replace(/https?:\/\//, '').replace(/\/$/, '');
+}
+function openOv(id) { document.getElementById(id).classList.add('show'); }
+function closeOv(id) { document.getElementById(id).classList.remove('show'); }
+function el(id) { return document.getElementById(id); }
+
+// ═══════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════
+function switchTab(tab) {
+  el('tab-login-btn').classList.toggle('on', tab === 'login');
+  el('tab-reg-btn').classList.toggle('on', tab === 'register');
+  el('tab-login').style.display = tab === 'login' ? 'block' : 'none';
+  el('tab-reg').style.display = tab === 'register' ? 'block' : 'none';
+}
+function fillDemo() {
+  el('l-email').value = 'demo@parkbike.uy';
+  el('l-pwd').value = 'demo123';
+  el('l-err').textContent = '';
+  doLogin();
+}
+function doLogin() {
+  var email = el('l-email').value.trim().toLowerCase();
+  var pwd = el('l-pwd').value;
+  var err = el('l-err');
+  if (!email || !pwd) { err.textContent = 'Completá todos los campos.'; return; }
+  var user = null;
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].email === email && users[i].pwd === pwd) { user = users[i]; break; }
+  }
+  if (!user) { err.textContent = 'Email o contraseña incorrectos.'; return; }
+  err.textContent = '';
+  enterApp(user);
+}
+function doRegister() {
+  var name = el('r-name').value.trim();
+  var lastname = el('r-lastname').value.trim();
+  var email = el('r-email').value.trim().toLowerCase();
+  var pwd = el('r-pwd').value;
+  var dob = el('r-dob').value;
+  var hasBike = el('r-bike').checked;
+  var hasEbike = el('r-ebike').checked;
+  var hasScooter = el('r-scooter').checked;
+  var err = el('r-err');
+  if (!name || !email || !pwd) { err.textContent = 'Completá los campos obligatorios.'; return; }
+  if (pwd.length < 6) { err.textContent = 'La contraseña debe tener al menos 6 caracteres.'; return; }
+  if (!/\S+@\S+\.\S+/.test(email)) { err.textContent = 'Ingresá un email válido.'; return; }
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].email === email) { err.textContent = 'Ese email ya está registrado.'; return; }
+  }
+  err.textContent = '';
+  var vehicles = [];
+  if (hasBike) vehicles.push('bike');
+  if (hasEbike) vehicles.push('ebike');
+  if (hasScooter) vehicles.push('scooter');
+  var displayName = lastname ? name + ' ' + lastname : name;
+  var user = {name: displayName, firstName: name, lastName: lastname, email: email, pwd: pwd, dob: dob || null, vehicles: vehicles};
+  users.push(user);
+localStorage.setItem('users', JSON.stringify(users));
+enterApp(user);
+}
+function enterApp(user) {
+  currentUser = user;
+  el('auth').style.display = 'none';
+  el('app').style.display = 'flex';
+  updateUserChip();
+  el('rv-name').value = user.name;
+
+  setTimeout(initMap, 300);
+}
+
+
+// ── AVATAR ──
+function updateUserChip() {
+  if (!currentUser) return;
+  var av = el('user-av');
+  if (currentUser.avatar) {
+    av.innerHTML = '<img src="' + currentUser.avatar + '" alt="avatar">';
+  } else {
+    av.textContent = (currentUser.firstName || currentUser.name || '?').charAt(0).toUpperCase();
+  }
+  el('user-nm').textContent = currentUser.firstName || currentUser.name;
+}
+function handleAvatarUpload(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { alert('La imagen es demasiado grande. Máximo 2MB.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var dataUrl = e.target.result;
+    // Show preview in modal
+    var prev = el('prof-av-preview');
+    prev.innerHTML = '<img src="' + dataUrl + '" alt="avatar">';
+    // Store temporarily
+    currentUser._pendingAvatar = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── FAVORITES ──
+var showOnlyFavs = false;
+function getFavs() {
+  if (!currentUser) return [];
+  return JSON.parse(localStorage.getItem('favs_' + currentUser.email) || '[]');
+}
+function isFavorite(id) {
+  return getFavs().indexOf(id) > -1;
+}
+function toggleFav(id) {
+  if (!currentUser) return;
+  var favs = getFavs();
+  var idx = favs.indexOf(id);
+  if (idx > -1) favs.splice(idx, 1);
+  else favs.push(id);
+  localStorage.setItem('favs_' + currentUser.email, JSON.stringify(favs));
+  renderAll();
+}
+function toggleFavFilter() {
+  showOnlyFavs = !showOnlyFavs;
+  el('f-favs').classList.toggle('on', showOnlyFavs);
+  renderAll();
+}
+function openProfile() {
+  if (!currentUser) return;
+  el('profile-email-lbl').textContent = currentUser.email;
+  el('p-name').value = currentUser.firstName || currentUser.name || '';
+  el('p-lastname').value = currentUser.lastName || '';
+  el('p-dob').value = currentUser.dob || '';
+  var v = currentUser.vehicles || [];
+  el('p-bike').checked = v.indexOf('bike') > -1;
+  el('p-ebike').checked = v.indexOf('ebike') > -1;
+  el('p-scooter').checked = v.indexOf('scooter') > -1;
+  // Avatar preview
+  var prev = el('prof-av-preview');
+  if (currentUser.avatar) {
+    prev.innerHTML = '<img src="' + currentUser.avatar + '" alt="avatar">';
+  } else {
+    prev.textContent = (currentUser.firstName || currentUser.name || '?').charAt(0).toUpperCase();
+    prev.innerHTML = prev.textContent;
+  }
+  currentUser._pendingAvatar = null;
+  el('p-err').textContent = '';
+  el('p-old-pwd').value = ''; el('p-new-pwd').value = ''; el('p-rep-pwd').value = '';
+  el('p-pwd-err').textContent = '';
+  switchProfTab('data');
+  openOv('ov-profile');
+}
+function switchProfTab(tab) {
+  el('ptab-data').classList.toggle('on', tab === 'data');
+  el('ptab-favs').classList.toggle('on', tab === 'favs');
+  el('ptab-pwd').classList.toggle('on', tab === 'pwd');
+  el('prof-data').style.display = tab === 'data' ? 'block' : 'none';
+  el('prof-favs').style.display = tab === 'favs' ? 'block' : 'none';
+  el('prof-pwd').style.display = tab === 'pwd' ? 'block' : 'none';
+  if (tab === 'favs') renderProfileFavs();
+}
+function renderProfileFavs() {
+  var favIds = getFavs();
+  var container = el('prof-favs-list');
+  if (!favIds.length) {
+    container.innerHTML = '<div style="text-align:center;padding:30px 16px;color:#94a3b8;font-size:.85rem;">Aún no tenés favoritos.<br><span style="font-size:1.4rem">⭐</span><br>Tocá la estrella en cualquier parking para guardarlo.</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < favIds.length; i++) {
+    var p = findPark(favIds[i]);
+    if (!p) continue;
+    var open = isOpen(p.schedule);
+    var typeLbl = {bike:'🚲 Bici', scooter:'🛴 Scooter', both:'🚲🛴 Ambos'}[p.type];
+    var typeCls = {bike:'p-bike', scooter:'p-scooter', both:'p-both'}[p.type];
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid #e2e8f0;" onclick="goToFavPark(' + p.id + ')">';
+    html += '<div style="width:38px;height:38px;border-radius:10px;background:#fffbeb;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">⭐</div>';
+    html += '<div style="flex:1;min-width:0;">';
+    html += '<div style="font-size:.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + p.name + '</div>';
+    html += '<div style="font-size:.72rem;color:#94a3b8;margin-top:2px;">' + p.addr + '</div>';
+    html += '<div style="display:flex;gap:4px;margin-top:4px;">';
+    html += '<span class="pill ' + typeCls + '">' + typeLbl + '</span>';
+    html += '<span class="pill ' + (open ? 'p-open' : 'p-closed') + '">' + (open ? '● Abierto' : '● Cerrado') + '</span>';
+    html += '</div></div>';
+    html += '<button onclick="event.stopPropagation();toggleFav(' + p.id + ');renderProfileFavs()" style="background:none;border:none;font-size:1.1rem;cursor:pointer;padding:4px;" title="Quitar de favoritos">🗑</button>';
+    html += '</div>';
+  }
+  container.innerHTML = html || '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.85rem;">No se encontraron parkings.</div>';
+}
+function goToFavPark(id) {
+  closeOv('ov-profile');
+  setTimeout(function() { selectPark(id); }, 200);
+}
+function saveProfile() {
+  var name = el('p-name').value.trim();
+  if (!name) { el('p-err').textContent = 'El nombre es obligatorio.'; return; }
+  var lastname = el('p-lastname').value.trim();
+  var dob = el('p-dob').value;
+  var vehicles = [];
+  if (el('p-bike').checked) vehicles.push('bike');
+  if (el('p-ebike').checked) vehicles.push('ebike');
+  if (el('p-scooter').checked) vehicles.push('scooter');
+  currentUser.firstName = name;
+  currentUser.lastName = lastname;
+  currentUser.name = lastname ? name + ' ' + lastname : name;
+  currentUser.dob = dob || null;
+  currentUser.vehicles = vehicles;
+  if (currentUser._pendingAvatar) {
+    currentUser.avatar = currentUser._pendingAvatar;
+    currentUser._pendingAvatar = null;
+  }
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].email === currentUser.email) { users[i] = currentUser; break; }
+  }
+  localStorage.setItem('users', JSON.stringify(users));
+  updateUserChip();
+  closeOv('ov-profile');
+  el('p-err').textContent = '';
+}
+function saveProfilePwd() {
+  var oldPwd = el('p-old-pwd').value;
+  var newPwd = el('p-new-pwd').value;
+  var repPwd = el('p-rep-pwd').value;
+  var err = el('p-pwd-err');
+  if (!oldPwd || !newPwd || !repPwd) { err.textContent = 'Completá todos los campos.'; return; }
+  if (oldPwd !== currentUser.pwd) { err.textContent = 'La contraseña actual es incorrecta.'; return; }
+  if (newPwd.length < 6) { err.textContent = 'La nueva contraseña debe tener al menos 6 caracteres.'; return; }
+  if (newPwd !== repPwd) { err.textContent = 'Las contraseñas no coinciden.'; return; }
+  currentUser.pwd = newPwd;
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].email === currentUser.email) { users[i] = currentUser; break; }
+  }
+  localStorage.setItem('users', JSON.stringify(users));
+  err.textContent = '';
+  el('p-old-pwd').value = ''; el('p-new-pwd').value = ''; el('p-rep-pwd').value = '';
+  closeOv('ov-profile');
+  alert('✅ Contraseña actualizada correctamente.');
+}
+function doLogout() {
+  currentUser = null;
+  if (isAdmin) logoutAdmin();
+  el('app').style.display = 'none';
+  el('auth').style.display = 'flex';
+  el('l-email').value = '';
+  el('l-pwd').value = '';
+  el('l-err').textContent = '';
+}
+
+// ═══════════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════════
+function toggleAdmin() {
+  if (isAdmin) logoutAdmin();
+  else { el('adm-pwd').value = ''; el('adm-pwd-err').textContent = ''; openOv('ov-adm-login'); }
+}
+function checkAdminPwd() {
+  if (el('adm-pwd').value === ADMIN_PWD) {
+    isAdmin = true;
+    closeOv('ov-adm-login');
+    el('btn-adm').classList.add('on');
+    el('btn-adm').textContent = '🔓 Admin';
+    el('adm-bar').classList.add('show');
+    el('btn-add').style.display = 'flex';
+    el('fab').style.display = 'flex';
+    renderAll();
+    if (curId) { var p = findPark(curId); if (p) showDetail(p); }
+  } else {
+    el('adm-pwd-err').textContent = 'Contraseña incorrecta.';
+    el('adm-pwd').value = '';
+  }
+}
+function logoutAdmin() {
+  isAdmin = false;
+  el('btn-adm').classList.remove('on');
+  el('btn-adm').textContent = '⚙ Admin';
+  el('adm-bar').classList.remove('show');
+  if (window.innerWidth >= 700) el('btn-add').style.display = 'none';
+  el('fab').style.display = 'none';
+  if (addingMode) cancelAdd();
+  if (relocating) cancelRelocate();
+  renderAll();
+  if (curId) { var p = findPark(curId); if (p) showDetail(p); }
+}
+function changePassword() {
+  var old = el('cp-old').value;
+  var nw = el('cp-new').value;
+  var rep = el('cp-rep').value;
+  var err = el('cp-err');
+  if (old !== ADMIN_PWD) { err.textContent = 'Contraseña actual incorrecta.'; return; }
+  if (nw.length < 6) { err.textContent = 'Mínimo 6 caracteres.'; return; }
+  if (nw !== rep) { err.textContent = 'Las contraseñas no coinciden.'; return; }
+  ADMIN_PWD = nw;
+  closeOv('ov-chpwd');
+  el('cp-old').value = ''; el('cp-new').value = ''; el('cp-rep').value = '';
+  alert('✅ Contraseña actualizada.');
+}
+
+// ═══════════════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════════════
+function initMap() {
+  if (mapReady) return;
+  mapReady = true;
+  leafMap = L.map('map', {center: [-34.9058, -56.165], zoom: 13, zoomControl: false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19
+  }).addTo(leafMap);
+  L.control.zoom({position: 'bottomright'}).addTo(leafMap);
+  leafMap.on('click', onMapClick);
+
+  // ── CICLOVÍAS OSM ──
+  cyclewayLayer = L.layerGroup();
+  loadCycleways();
+
+  function fixSize() { leafMap.invalidateSize({animate:false}); }
+  fixSize();
+  setTimeout(fixSize, 100);
+  setTimeout(fixSize, 300);
+  setTimeout(fixSize, 700);
+  setTimeout(fixSize, 1500);
+  window.addEventListener('resize', function() { setTimeout(fixSize, 150); });
+  renderAll();
+}
+
+var cyclewayLayer = null;
+var cyclewaysVisible = false;
+var cyclewaysLoaded = false;
+
+function loadCycleways() {
+  if (cyclewaysLoaded) return;
+  cyclewaysLoaded = true;
+  // Bounding box de Montevideo: sur=-34.95, oeste=-56.35, norte=-34.83, este=-55.95
+  var bbox = '(-34.95,-56.35,-34.83,-55.95)';
+  var query = '[out:json][timeout:30];(way["highway"="cycleway"]' + bbox + ';way["cycleway"~"lane|track"]' + bbox + ';);out geom;';
+  var servers = [
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
+  ];
+  function tryServer(idx) {
+    if (idx >= servers.length) {
+      cyclewaysLoaded = false;
+      var btn = el('f-cycleways');
+      if (btn) { btn.textContent = '⚠️ Sin datos'; btn.disabled = true; }
+      return;
+    }
+    fetch(servers[idx] + '?data=' + encodeURIComponent(query))
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(data) {
+        if (!data.elements || !data.elements.length) { tryServer(idx + 1); return; }
+        data.elements.forEach(function(way) {
+          if (!way.geometry) return;
+          var latlngs = way.geometry.map(function(n) { return [n.lat, n.lon]; });
+          L.polyline(latlngs, { color:'#22c55e', weight:4, opacity:.9 }).addTo(cyclewayLayer);
+        });
+        if (cyclewaysVisible) cyclewayLayer.addTo(leafMap);
+      })
+      .catch(function() { tryServer(idx + 1); });
+  }
+  tryServer(0);
+}
+
+function toggleCycleways() {
+  cyclewaysVisible = !cyclewaysVisible;
+  var btn = el('f-cycleways');
+  if (cyclewaysVisible) {
+    loadCycleways();
+    if (leafMap) cyclewayLayer.addTo(leafMap);
+    btn.classList.add('on');
+    btn.style.borderColor = '#22c55e';
+    btn.style.color = '#16a34a';
+    btn.style.background = '#f0fdf4';
+  } else {
+    if (leafMap) leafMap.removeLayer(cyclewayLayer);
+    btn.classList.remove('on');
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    btn.style.background = '';
+  }
+}
+function mkIcon(type, selected, open) {
+  var cols = {bike:'#2e7d32', scooter:'#0277bd', both:'#e65100'};
+  var emos = {bike:'🚲', scooter:'🛴', both:'🚲'};
+  var c = open ? (cols[type] || '#2e7d32') : '#9e9e9e';
+  var sz = selected ? 42 : 34;
+  var bord = selected
+    ? 'box-shadow:0 0 0 3px ' + c + '30,0 4px 16px rgba(0,0,0,.25);border:3px solid ' + c + ';'
+    : 'box-shadow:0 2px 10px rgba(0,0,0,.2);border:2.5px solid ' + c + ';';
+  var ico = open ? (emos[type] || '🚲') : '🔒';
+  var fsz = selected ? 18 : 14;
+  var div = '<div style="width:' + sz + 'px;height:' + sz + 'px;background:#fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;' + bord + '">'
+    + '<span style="transform:rotate(45deg);font-size:' + fsz + 'px">' + ico + '</span></div>';
+  return L.divIcon({className:'', html:div, iconSize:[sz,sz], iconAnchor:[sz/2,sz], popupAnchor:[0,-sz]});
+}
+function onMapClick(e) {
+  var lat = e.latlng.lat;
+  var lng = e.latlng.lng;
+
+  if (addingMode) {
+    pendingLat = lat;
+    pendingLng = lng;
+
+    if (tmpMkr) leafMap.removeLayer(tmpMkr);
+
+    tmpMkr = L.marker([lat, lng], {
+      icon: mkIcon('bike', false, true)
+    }).addTo(leafMap);
+
+    if (pendingPickFromBtn) {
+      pendingPickFromBtn = false;
+      if (leafMap) leafMap.getContainer().style.cursor = '';
+      el('map-banner').className = '';
+      var pickBtn = el('btn-pickmap');
+      if (pickBtn) {
+        pickBtn.textContent = '✅ Ubicación: ' + lat.toFixed(4) + ', ' + lng.toFixed(4);
+        pickBtn.classList.add('picked');
+      }
+      var hint = el('add-hint');
+      if (hint) { hint.style.display = 'none'; }
+      el('n-lat').value = lat.toFixed(5);
+      el('n-lng').value = lng.toFixed(5);
+      openOv('ov-add');
+    } else {
+      el('add-hint').style.display = 'block';
+      el('add-hint').textContent = '✓ Ubicación: ' + lat.toFixed(4) + ', ' + lng.toFixed(4);
+      el('n-lat').value = lat.toFixed(5);
+      el('n-lng').value = lng.toFixed(5);
+    }
+
+    return;
+  }
+
+  if (relocating) {
+    var p = findPark(relocId);
+    if (!p) return;
+
+    p.lat = lat;
+    p.lng = lng;
+
+    cancelRelocate();
+    renderAll();
+
+    setTimeout(function () {
+      selectPark(p.id);
+    }, 200);
+
+    return;
+  }
+
+  if (window.innerWidth < 700) collapseSheet();
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════
+function findPark(id) {
+  for (var i = 0; i < parks.length; i++) { if (parks[i].id === id) return parks[i]; }
+  return null;
+}
+function visibleParks() {
+  return parks.filter(function(p) {
+    if (!filters[p.type]) return false;
+    if (showOnlyFavs && !isFavorite(p.id)) return false;
+    if (!searchQuery) return true;
+    var q = searchQuery.toLowerCase();
+    return p.name.toLowerCase().indexOf(q) > -1
+        || p.addr.toLowerCase().indexOf(q) > -1;
+  });
+}
+function renderAll() {
+  renderList();
+  renderMarkers();
+  updateCount();
+}
+function updateCount() {
+  var v = visibleParks();
+  var openCount = 0;
+  for (var i = 0; i < v.length; i++) { if (isOpen(v[i].schedule)) openCount++; }
+  el('sb-count').textContent = v.length + ' parking' + (v.length !== 1 ? 's' : '') + ' · ' + openCount + ' abiertos ahora';
+}
+function renderList() {
+  var v = visibleParks();
+  var html = '';
+  for (var i = 0; i < v.length; i++) {
+    var p = v[i];
+    var open = isOpen(p.schedule);
+    var a = avgR(p.reviews);
+    var typeCls = {bike:'p-bike', scooter:'p-scooter', both:'p-both'}[p.type];
+    var typeLbl = {bike:'🚲 Bici', scooter:'🛴 Scooter', both:'🚲🛴 Ambos'}[p.type];
+    var sel = selId === p.id ? ' sel' : '';
+
+    var starsHtml = '';
+    if (a) {
+      starsHtml += '<span class="star-txt">' + '★'.repeat(Math.floor(+a)) + '☆'.repeat(5-Math.ceil(+a)) + '</span>&nbsp;' + a + ' (' + p.reviews.length + ')';
+    } else {
+      starsHtml = 'Sin valoraciones';
+    }
+
+    var admHtml = '';
+    if (isAdmin) {
+      admHtml = '<div class="adm-row">'
+        + '<button class="adm-ca" onclick="event.stopPropagation();openEdit(' + p.id + ')">✏️ Editar</button>'
+        + '<button class="adm-ca" onclick="event.stopPropagation();startRelocate(' + p.id + ')">📍 Reubicar</button>'
+        + '<button class="adm-ca del" onclick="event.stopPropagation();deletePark(' + p.id + ')">🗑 Eliminar</button>'
+        + '</div>';
+    }
+
+    html += '<div class="pcard' + sel + '" onclick="selectPark(' + p.id + ')">';
+    html += '<div class="pc-top"><div class="pc-name">' + p.name + '</div>';
+    html += '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">';
+    var isFav = isFavorite(p.id);
+    html += '<button class="btn-fav" onclick="event.stopPropagation();toggleFav(' + p.id + ')" title="' + (isFav ? 'Quitar de favoritos' : 'Agregar a favoritos') + '">' + (isFav ? '⭐' : '☆') + '</button>';
+    html += '<div class="pc-pills">';
+    html += '<span class="pill ' + typeCls + '">' + typeLbl + '</span>';
+    html += '<span class="pill ' + (open ? 'p-open' : 'p-closed') + '">' + (open ? '● Abierto' : '● Cerrado') + '</span>';
+    if (isAdmin) html += '<span class="pill p-adm">✏ admin</span>';
+    html += '</div></div></div>';
+    html += '<div class="pc-addr">' + p.addr + '</div>';
+    html += '<div class="pc-meta"><div class="pc-stars">' + starsHtml + '</div>';
+    html += '<span class="pc-cost">' + dcost(p.cost) + '</span></div>';
+    html += admHtml + '</div>';
+  }
+  if (!html) {
+    var msg = searchQuery
+      ? '<div style="padding:24px 16px;text-align:center;color:#6b7280;font-size:.85rem">No se encontraron parkings para <b>"' + searchQuery + '"</b></div>'
+      : '<div style="padding:24px 16px;text-align:center;color:#6b7280;font-size:.85rem">No hay parkings con estos filtros.</div>';
+    el('park-list').innerHTML = msg;
+  } else {
+    el('park-list').innerHTML = html;
+  }
+}
+function renderMarkers() {
+  if (!mapReady) return;
+  for (var k in mkrs) { leafMap.removeLayer(mkrs[k]); }
+  mkrs = {};
+  var v = visibleParks();
+  for (var i = 0; i < v.length; i++) {
+    (function(p) {
+      var open = isOpen(p.schedule);
+      var m = L.marker([p.lat, p.lng], {icon: mkIcon(p.type, selId === p.id, open)}).addTo(leafMap);
+      m.on('click', function() { selectPark(p.id); });
+      mkrs[p.id] = m;
+    })(v[i]);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SELECT & DETAIL
+// ═══════════════════════════════════════════════════
+function selectPark(id) {
+  selId = id; curId = id;
+  var p = findPark(id);
+  if (!p) return;
+  renderAll();
+  if (mapReady) leafMap.flyTo([p.lat, p.lng], 16, {duration: 0.7});
+  showPopup(p);
+  showDetail(p);
+  if (window.innerWidth < 700) expandSheet();
+}
+function showPopup(p) {
+  if (!mapReady || !mkrs[p.id]) return;
+  var open = isOpen(p.schedule);
+  var a = avgR(p.reviews);
+  var tc = {bike:'#2e7d32', scooter:'#0277bd', both:'#e65100'}[p.type];
+  var tl = {bike:'🚲 Bicicletas', scooter:'🛴 Monopatines', both:'🚲🛴 Ambos'}[p.type];
+  var html = '<div class="pop-inner">';
+  html += '<div class="pop-type" style="color:' + tc + '">' + tl + '</div>';
+  html += '<div class="pop-name">' + p.name + '</div>';
+  html += '<div class="pop-addr">' + p.addr + '</div>';
+  html += '<div class="pop-pills">';
+  html += '<span class="pill ' + (open ? 'p-open' : 'p-closed') + '">' + (open ? '● Abierto' : '● Cerrado') + '</span> ';
+  html += '<span class="pill p-both">' + dcost(p.cost) + '</span>';
+  if (p.covered) html += ' <span class="pill" style="background:#e0f2fe;color:#0277bd">☂️ Cubierto</span>';
+  if (a) html += ' <span class="pill" style="background:#fff8e1;color:#f59e0b">★ ' + a + '</span>';
+  if (p.phone) html += '<br><span class="pill p-bike" style="margin-top:3px">📞 ' + p.phone + '</span>';
+  html += '</div>';
+  html += '<button class="pop-btn" onclick="showDetailById(' + p.id + ')">Ver detalles →</button>';
+  html += '</div>';
+  mkrs[p.id].bindPopup(html, {maxWidth: 280}).openPopup();
+}
+function showDetailById(id) {
+  var p = findPark(id);
+  if (p) { showDetail(p); if (window.innerWidth < 700) expandSheet(); }
+}
+function showDetail(p) {
+  curId = p.id;
+  var open = isOpen(p.schedule);
+  var a = avgR(p.reviews);
+  var typeCls = {bike:'p-bike', scooter:'p-scooter', both:'p-both'}[p.type];
+  var typeLbl = {bike:'🚲 Bicicletas', scooter:'🛴 Monopatines', both:'🚲🛴 Ambos'}[p.type];
+
+  el('det-edit').style.display = isAdmin ? 'block' : 'none';
+  el('det-title').textContent = p.name;
+
+  // Build HTML using string concatenation (no template literals)
+  var html = '';
+
+  // Badges
+  html += '<div class="det-badges">';
+  html += '<span class="pill ' + typeCls + '" style="font-size:.65rem;padding:3px 10px">' + typeLbl + '</span> ';
+  html += '<span class="pill ' + (open ? 'p-open' : 'p-closed') + '" style="font-size:.65rem;padding:3px 10px">' + (open ? '● Abierto ahora' : '● Cerrado ahora') + '</span>';
+  html += '</div>';
+
+  // Address
+  html += '<div class="det-addr">📍 ' + p.addr + '</div>';
+
+  // Info grid
+  html += '<div class="info-grid">';
+  html += '<div class="ibox"><div class="ibox-lbl">Estado</div><div class="ibox-val ' + (open ? 'v-green' : 'v-red') + '">' + (open ? 'Abierto' : 'Cerrado') + '</div></div>';
+  html += '<div class="ibox"><div class="ibox-lbl">Costo</div><div class="ibox-val v-orange">' + dcost(p.cost) + '</div></div>';
+  html += '<div class="ibox"><div class="ibox-lbl">Cobertura</div><div class="ibox-val">' + (p.covered ? '<span style="color:#0277bd">☂️ Cubierto</span>' : '<span style="color:#f59e0b">🌤️ Descubierto</span>') + '</div></div>';
+  html += '<div class="ibox" style="grid-column:1/-1"><div class="ibox-lbl">Valoración media</div>';
+  if (a) {
+    html += '<div class="ibox-val v-yellow">★ ' + a + ' / 5 (' + p.reviews.length + ' opinión' + (p.reviews.length !== 1 ? 'es' : '') + ')</div>';
+  } else {
+    html += '<div class="ibox-val" style="color:#6b7280;font-size:.82rem">Sin valoraciones aún</div>';
+  }
+  html += '</div></div>';
+
+  // Contact block
+  if (p.phone || p.url) {
+    html += '<div class="contact-block">';
+    html += '<div class="contact-lbl">📬 Contacto</div>';
+    if (p.phone) {
+      html += '<a href="tel:' + p.phone + '" class="contact-link contact-link-phone">';
+      html += '<span class="contact-icon">📞</span>';
+      html += '<div><div class="contact-info-lbl">Teléfono</div><div class="contact-info-val">' + p.phone + '</div></div>';
+      html += '</a>';
+    }
+    if (p.url) {
+      html += '<a href="' + p.url + '" target="_blank" rel="noopener" class="contact-link contact-link-web">';
+      html += '<span class="contact-icon">' + urlIcon(p.url) + '</span>';
+      html += '<div><div class="contact-info-lbl">' + urlLabel(p.url) + '</div><div class="contact-info-val">' + urlShort(p.url) + '</div></div>';
+      html += '</a>';
+    }
+    html += '</div>';
+  }
+
+  // Schedule
+  html += '<div class="sec-title">🕐 Horario semanal</div>';
+  html += '<div class="h-list">';
+  for (var i = 0; i < DAYS.length; i++) {
+    var todayCls = i === TODAY ? ' today' : '';
+    var todayMark = i === TODAY ? ' <b style="color:#2e7d32">(hoy)</b>' : '';
+    html += '<div class="h-row' + todayCls + '"><span class="h-day">' + DAYS[i] + todayMark + '</span><span class="h-hour">' + hlbl(p.schedule) + '</span></div>';
+  }
+  html += '</div>';
+
+  // Reviews
+  html += '<div class="sec-title">💬 Opiniones (' + p.reviews.length + ')</div>';
+  html += '<div class="rev-list">';
+  if (p.reviews.length) {
+    for (var j = 0; j < p.reviews.length; j++) {
+      var r = p.reviews[j];
+      html += '<div class="rev-card">';
+      html += '<div class="rev-top"><span class="rev-name">' + r.name + '</span><span class="rev-stars">' + '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) + '</span></div>';
+      html += '<div class="rev-date">' + fmtDate(r.date) + '</div>';
+      html += '<div class="rev-text">' + r.text + '</div>';
+      if (isAdmin) html += '<button class="rev-del" style="display:block" onclick="deleteReview(' + p.id + ',' + j + ')">🗑 Eliminar</button>';
+      html += '</div>';
+    }
+  } else {
+    html += '<div class="no-revs">¡Aún no hay opiniones sobre este parking. Sé el primero! 🙌</div>';
+  }
+  html += '</div>';
+  html += '<button class="btn-rev" onclick="openRev(' + p.id + ')">＋ Escribir una opinión</button>';
+  var fav = isFavorite(p.id);
+  html += '<button class="det-fav-btn' + (fav ? ' on' : '') + '" onclick="toggleFav(' + p.id + ');showDetail(findPark(' + p.id + '))">' + (fav ? '⭐ En tus favoritos' : '☆ Agregar a favoritos') + '</button>';
+  html += '<button class="btn-dir" onclick="window.open(\'https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng + '&travelmode=bicycling\',\'_blank\')">🗺️ Cómo llegar</button>';
+  html += '<div style="height:20px"></div>';
+
+  el('det-body').innerHTML = html;
+  el('detail').classList.add('open');
+}
+function closeDetail() {
+  el('detail').classList.remove('open');
+  selId = null; curId = null;
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════
+// SHEET (mobile)
+// ═══════════════════════════════════════════════════
+function toggleSheet() { sheetUp ? collapseSheet() : expandSheet(); }
+function expandSheet() { el('sidebar').classList.add('up'); sheetUp = true; }
+function collapseSheet() { el('sidebar').classList.remove('up'); sheetUp = false; }
+
+// ═══════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════
+function onSearch(val) {
+  searchQuery = val.trim();
+  var btn = document.getElementById('search-clear');
+  if (btn) btn.classList.toggle('show', searchQuery.length > 0);
+  renderAll();
+  // On mobile expand sheet to show results
+  if (searchQuery && window.innerWidth < 700) expandSheet();
+}
+function clearSearch() {
+  searchQuery = '';
+  var inp = document.getElementById('search-input');
+  if (inp) inp.value = '';
+  var btn = document.getElementById('search-clear');
+  if (btn) btn.classList.remove('show');
+  renderAll();
+}
+function toggleFilter(type, btn) {
+  filters[type] = !filters[type];
+  var cls = {bike:'f-bike', scooter:'f-scooter', both:'f-both'}[type];
+  btn.classList.toggle(cls, filters[type]);
+  btn.style.opacity = filters[type] ? '1' : '0.4';
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════
+// ADD
+// ═══════════════════════════════════════════════════
+function startAdd() {
+  if (!isAdmin) return;
+  addingMode = true;
+  pendingLat = null; pendingLng = null;
+  var btn = el('btn-pickmap');
+  if (btn) { btn.textContent = '📍 Tocar el mapa para ubicar'; btn.classList.remove('picked'); }
+  el('add-hint').style.display = 'none';
+  el('n-name').value = ''; el('n-addr').value = ''; el('n-cost').value = ''; el('n-phone').value = ''; el('n-url').value = '';
+  el('n-lat').value = ''; el('n-lng').value = '';
+  el('n-24h').checked = false; el('n-times').style.display = 'block'; el('n-covered').checked = false;
+  var nDayLabels = el('n-days').querySelectorAll('.day-chk');
+  for (var ndi = 0; ndi < nDayLabels.length; ndi++) {
+    nDayLabels[ndi].classList.remove('checked');
+    nDayLabels[ndi].querySelector('input').checked = false;
+  }
+  el('n-open').value = '08:00'; el('n-close').value = '22:00';
+  if (leafMap) leafMap.getContainer().style.cursor = 'crosshair';
+  var banner = el('map-banner');
+  banner.className = 'adding';
+  el('ban-txt').textContent = '📍 Tocá el mapa para colocar el nuevo parking';
+  el('ban-cancel').onclick = cancelAdd;
+  openOv('ov-add');
+  if (window.innerWidth < 700) collapseSheet();
+}
+function pickOnMap() {
+  if (!isAdmin) return;
+  addingMode = true;
+  if (leafMap) leafMap.getContainer().style.cursor = 'crosshair';
+  var banner = el('map-banner');
+  banner.className = 'adding';
+  el('ban-txt').textContent = '📍 Tocá el mapa para colocar el nuevo parking';
+  el('ban-cancel').onclick = function() { cancelPickMap(); };
+  // Minimize modal so map is accessible
+  el('ov-add').classList.remove('show');
+  pendingPickFromBtn = true;
+}
+var pendingPickFromBtn = false;
+function cancelPickMap() {
+  pendingPickFromBtn = false;
+  if (leafMap) leafMap.getContainer().style.cursor = '';
+  el('map-banner').className = '';
+  openOv('ov-add');
+}
+function cancelAdd() {
+  addingMode = false; pendingLat = null; pendingLng = null; pendingPickFromBtn = false;
+  if (leafMap) leafMap.getContainer().style.cursor = '';
+  el('map-banner').className = '';
+  if (tmpMkr) { leafMap.removeLayer(tmpMkr); tmpMkr = null; }
+  var pickBtn = el('btn-pickmap');
+  if (pickBtn) { pickBtn.textContent = '📍 Tocar el mapa para ubicar'; pickBtn.classList.remove('picked'); }
+  var hint = el('add-hint');
+  if (hint) hint.style.display = 'none';
+  closeOv('ov-add');
+}
+function toggle24(prefix) {
+  var cb = el(prefix + '-24h');
+  cb.checked = !cb.checked;
+  var lbl = el(prefix + '-24h-label');
+  if (lbl) lbl.classList.toggle('on', cb.checked);
+  el(prefix + '-times').style.display = cb.checked ? 'none' : 'block';
+}
+function toggleDay(div) {
+  div.classList.toggle('checked');
+  var chk = div.querySelector('input[type=checkbox]');
+  if (chk) chk.checked = div.classList.contains('checked');
+}
+
+function getSched(prefix) {
+  if (el(prefix + '-24h').checked) return '24h';
+  var times = (el(prefix + '-open').value || '08:00') + '-' + (el(prefix + '-close').value || '22:00');
+  var closed = [];
+  var boxes = el(prefix + '-days').querySelectorAll('.day-chk.checked input');
+  for (var i = 0; i < boxes.length; i++) closed.push(boxes[i].value);
+  return closed.length ? (times + '|' + closed.join(',')) : times;
+}
+function saveNew() {
+  var name = el('n-name').value.trim();
+  var addr = el('n-addr').value.trim();
+  var type = el('n-type').value;
+  var sched = getSched('n');
+  var cost = el('n-cost').value.trim() || 'Gratuito';
+  var phone = el('n-phone').value.trim();
+  var url = el('n-url').value.trim();
+  var lat = pendingLat !== null ? pendingLat : parseFloat(el('n-lat').value);
+  var lng = pendingLng !== null ? pendingLng : parseFloat(el('n-lng').value);
+  if (!name) { alert('Ingresá un nombre'); return; }
+  if (isNaN(lat) || isNaN(lng)) { alert('Tocá el mapa para elegir la ubicación'); return; }
+  var covered = el('n-covered').checked;
+  var p = {id: nxtId++, name: name, addr: addr || 'Montevideo', type: type, lat: lat, lng: lng, cost: cost, schedule: sched, phone: phone, url: url, covered: covered, reviews: []};
+  parks.push(p);
+localStorage.setItem('parks', JSON.stringify(parks));
+  cancelAdd();
+  renderAll();
+  setTimeout(function() { selectPark(p.id); }, 300);
+}
+
+// ═══════════════════════════════════════════════════
+// EDIT
+// ═══════════════════════════════════════════════════
+function openEdit(id) {
+  var p = findPark(id);
+  if (!p) return;
+  el('e-id').value = p.id;
+  el('e-name').value = p.name;
+  el('e-addr').value = p.addr;
+  el('e-type').value = p.type;
+  el('e-cost').value = p.cost || '';
+  el('e-phone').value = p.phone || '';
+  el('e-url').value = p.url || '';
+  el('e-covered').checked = p.covered || false;
+  var eRadios = document.querySelectorAll('input[name="e-covered-opt"]');
+  for (var ri = 0; ri < eRadios.length; ri++) {
+    eRadios[ri].checked = (eRadios[ri].value === (p.covered ? 'yes' : 'no'));
+  }
+  if (p.schedule === '24h') {
+    el('e-24h').checked = true; el('e-times').style.display = 'none';
+    var lbl24 = el('e-24h-label'); if (lbl24) lbl24.classList.add('on');
+  } else {
+    el('e-24h').checked = false; el('e-times').style.display = 'block';
+    var lbl24b = el('e-24h-label'); if (lbl24b) lbl24b.classList.remove('on');
+    var pipeIdx = p.schedule.indexOf('|');
+    var timePart = pipeIdx > -1 ? p.schedule.substring(0, pipeIdx) : p.schedule;
+    var closedDays = pipeIdx > -1 ? p.schedule.substring(pipeIdx + 1).split(',').map(Number) : [];
+    var tparts = timePart.split('-');
+    el('e-open').value = tparts[0] || '08:00';
+    el('e-close').value = tparts[1] || '22:00';
+    // Set closed day checkboxes
+    var dayLabels = el('e-days').querySelectorAll('.day-chk');
+    for (var di = 0; di < dayLabels.length; di++) {
+      var chk = dayLabels[di].querySelector('input');
+      var isClosedDay = closedDays.indexOf(parseInt(chk.value, 10)) > -1;
+      dayLabels[di].classList.toggle('checked', isClosedDay);
+      chk.checked = isClosedDay;
+    }
+  }
+  openOv('ov-edit');
+}
+function saveEdit() {
+  var id = parseInt(el('e-id').value, 10);
+  var p = findPark(id);
+  if (!p) return;
+  p.name = el('e-name').value.trim() || p.name;
+  p.addr = el('e-addr').value.trim() || p.addr;
+  p.type = el('e-type').value;
+  p.schedule = getSched('e');
+  p.cost = el('e-cost').value.trim() || 'Gratuito';
+  p.phone = el('e-phone').value.trim();
+  p.url = el('e-url').value.trim();
+  p.covered = el('e-covered').checked;
+  closeOv('ov-edit');
+  selId = id; curId = id;
+  renderAll();
+  showDetail(p);
+}
+function deletePark(id) {
+  var p = findPark(id);
+  if (!p) return;
+  if (!confirm('¿Eliminás el parking "' + p.name + '"?')) return;
+  parks = parks.filter(function(x) { return x.id !== id; });
+  closeOv('ov-edit');
+  closeDetail();
+  renderAll();
+}
+
+// ═══════════════════════════════════════════════════
+// RELOCATE
+// ═══════════════════════════════════════════════════
+function startRelocate(id) {
+  relocating = true; relocId = id;
+  if (leafMap) leafMap.getContainer().style.cursor = 'crosshair';
+  var banner = el('map-banner');
+  banner.className = 'relocating';
+  el('ban-txt').textContent = '📍 Tocá el nuevo lugar en el mapa';
+  el('ban-cancel').onclick = cancelRelocate;
+  if (window.innerWidth < 700) collapseSheet();
+}
+function cancelRelocate() {
+  relocating = false; relocId = null;
+  if (leafMap) leafMap.getContainer().style.cursor = '';
+  el('map-banner').className = '';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') { if (relocating) cancelRelocate(); if (addingMode) cancelAdd(); }
+});
+
+// ═══════════════════════════════════════════════════
+// REVIEWS
+// ═══════════════════════════════════════════════════
+function openRev(id) {
+  revTarget = id; selStars = 0;
+  if (currentUser) el('rv-name').value = currentUser.name;
+  el('rv-text').value = '';
+  var stars = document.querySelectorAll('.sp');
+  for (var i = 0; i < stars.length; i++) stars[i].classList.remove('on');
+  openOv('ov-rev');
+}
+function pickStar(v) {
+  selStars = v;
+  var stars = document.querySelectorAll('.sp');
+  for (var i = 0; i < stars.length; i++) {
+    if (i < v) stars[i].classList.add('on');
+    else stars[i].classList.remove('on');
+  }
+}
+function saveRev() {
+  var name = el('rv-name').value.trim() || 'Anónimo';
+  var text = el('rv-text').value.trim();
+  if (!selStars) { alert('Elegí una valoración'); return; }
+  if (!text) { alert('Escribí un comentario'); return; }
+  var p = findPark(revTarget);
+  if (!p) return;
+  p.reviews.unshift({name: name, rating: selStars, text: text, date: Date.now()});
+  closeOv('ov-rev');
+  renderAll();
+  if (curId === p.id) showDetail(p);
+}
+function deleteReview(pid, idx) {
+  if (!isAdmin) return;
+  var p = findPark(pid);
+  if (!p) return;
+  p.reviews.splice(idx, 1);
+  renderAll();
+  showDetail(p);
+}
+
+// ═══════════════════════════════════════════════════
+// MOBILE SHEET
+// ═══════════════════════════════════════════════════
+function toggleSheet() {
+  if (window.innerWidth >= 700) return;
+  var sb = el('sidebar');
+  sheetUp = !sheetUp;
+  sb.classList.toggle('up', sheetUp);
+}
+function expandSheet() {
+  if (window.innerWidth >= 700) return;
+  sheetUp = true;
+  el('sidebar').classList.add('up');
+}
+function collapseSheet() {
+  if (window.innerWidth >= 700) return;
+  sheetUp = false;
+  el('sidebar').classList.remove('up');
+}
+
+// Init
+window.addEventListener('DOMContentLoaded', function() {
+  // nothing — app starts on login
+});
+</script>
+</body>
+</html>
