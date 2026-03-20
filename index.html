@@ -264,6 +264,17 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   .btn-add { display:none; }
   #fab { display:none; position:absolute; bottom:165px; right:14px; z-index:200; width:50px; height:50px; border-radius:50%; background:#2e7d32; color:#fff; border:none; cursor:pointer; font-size:1.4rem; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(46,125,50,.4); }
   #btn-locate { display:flex; position:absolute; bottom:105px; right:14px; z-index:200; width:44px; height:44px; border-radius:50%; background:#fff; color:#6366f1; border:2px solid #e0e7ff; cursor:pointer; font-size:1.2rem; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+
+  /* Mobile filters: two rows */
+  .filters { height:auto !important; flex-wrap:wrap; gap:5px; padding:7px 10px; }
+  .fbtn { font-size:.73rem; padding:5px 9px; }
+
+  /* Mobile search bar: no nearest button inline */
+  .btn-nearest { display:none !important; }
+
+  /* Mobile second filter row: nearest + cycleways compact */
+  .filters-row2 { display:flex; gap:5px; width:100%; padding:0 10px 7px; background:#fff; border-bottom:1px solid #e2e6ed; }
+  .fbtn-compact { display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:100px; border:1.5px solid #e2e6ed; background:none; color:#6b7280; font-family:'Inter',sans-serif; font-size:.73rem; font-weight:500; cursor:pointer; flex:1; justify-content:center; }
 }
 @media (min-width:700px) {
   .sb-handle { display:none; }
@@ -515,7 +526,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
     <button id="btn-nearest" class="btn-nearest" onclick="findNearest()">📍 Parking más cercano</button>
   </div>
   <!-- Filters -->
-  <div class="filters">
+  <div class="filters" id="filters-bar">
     <button class="fbtn" id="f-bike" onclick="toggleFilter('bike',this)"><span class="fdot" style="background:#2e7d32"></span>Bicicletas</button>
     <button class="fbtn" id="f-scooter" onclick="toggleFilter('scooter',this)"><span class="fdot" style="background:#0277bd"></span>Monopatines</button>
     <button class="fbtn" id="f-both" onclick="toggleFilter('both',this)"><span class="fdot" style="background:#e65100"></span>Ambos</button>
@@ -523,6 +534,11 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
     <button class="fbtn" id="f-open" onclick="toggleStatusFilter('open')"><span class="fdot" style="background:#2e7d32"></span>Abiertos</button>
     <button class="fbtn" id="f-closed" onclick="toggleStatusFilter('closed')"><span class="fdot" style="background:#c62828"></span>Cerrados</button>
     <button class="fbtn" id="f-cycleways" onclick="toggleCycleways()"><span class="fdot" style="background:#22c55e"></span>Ciclovías</button>
+  </div>
+  <!-- Mobile second row: cycleways + nearest (hidden on desktop) -->
+  <div class="filters-row2" id="filters-row2" style="display:none;">
+    <button class="fbtn-compact" id="f-cycleways-mob" onclick="toggleCycleways()"><span class="fdot" style="background:#22c55e;width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:2px;"></span>Ciclovías</button>
+    <button class="fbtn-compact" onclick="findNearest()">📍 Más cercano</button>
   </div>
   <!-- Content -->
   <div class="content">
@@ -1740,6 +1756,13 @@ function enterApp(user) {
   el('rv-name').value = user.name;
   fetchWeather();
   setTimeout(renderRecent, 500);
+  // Show mobile second row
+  if (window.innerWidth < 700) {
+    var row2 = el('filters-row2');
+    if (row2) row2.style.display = 'flex';
+    var cycMain = el('f-cycleways');
+    if (cycMain) cycMain.style.display = 'none';
+  }
   // Init filter button styles
   var fbikeBtn = el('f-bike'); if(fbikeBtn){fbikeBtn.style.borderColor='#2e7d32';fbikeBtn.style.color='#2e7d32';fbikeBtn.style.background='#e8f5e9';}
   var fscBtn = el('f-scooter'); if(fscBtn){fscBtn.style.borderColor='#0277bd';fscBtn.style.color='#0277bd';fscBtn.style.background='#e3f2fd';}
@@ -2078,19 +2101,18 @@ function loadCycleways() {
 function toggleCycleways() {
   cyclewaysVisible = !cyclewaysVisible;
   var btn = el('f-cycleways');
+  var btnMob = el('f-cycleways-mob');
+  [btn, btnMob].forEach(function(b) {
+    if (!b) return;
+    b.style.borderColor = cyclewaysVisible ? '#22c55e' : '';
+    b.style.color = cyclewaysVisible ? '#16a34a' : '';
+    b.style.background = cyclewaysVisible ? '#f0fdf4' : '';
+  });
   if (cyclewaysVisible) {
     loadCycleways();
     if (leafMap) cyclewayLayer.addTo(leafMap);
-    btn.classList.add('on');
-    btn.style.borderColor = '#22c55e';
-    btn.style.color = '#16a34a';
-    btn.style.background = '#f0fdf4';
   } else {
     if (leafMap) leafMap.removeLayer(cyclewayLayer);
-    btn.classList.remove('on');
-    btn.style.borderColor = '';
-    btn.style.color = '';
-    btn.style.background = '';
   }
 }
 function mkIcon(type, selected, open) {
