@@ -192,23 +192,23 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .park-list::-webkit-scrollbar-thumb { background:#e2e6ed; }
 
 /* PARK CARD */
-.pcard { padding:13px 16px; border-bottom:1px solid #e2e6ed; cursor:pointer; background:#fff; }
+.pcard { padding:14px 16px; border-bottom:1px solid #e2e6ed; cursor:pointer; background:#fff; }
 .pcard:hover, .pcard.sel { background:#f0f4ff; }
-.pc-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:4px; }
-.pc-name { font-size:.88rem; font-weight:600; line-height:1.25; flex:1; font-family:'Sora',sans-serif; }
+.pc-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:5px; }
+.pc-name { font-size:.9rem; font-weight:600; line-height:1.3; flex:1; font-family:'Sora',sans-serif; }
 .pc-pills { display:flex; flex-direction:column; align-items:flex-end; gap:3px; flex-shrink:0; }
-.pill { font-size:.58rem; font-family:'Sora',sans-serif; font-weight:700; padding:2px 7px; border-radius:100px; white-space:nowrap; }
+.pill { font-size:.6rem; font-family:'Inter',sans-serif; font-weight:700; padding:3px 8px; border-radius:100px; white-space:nowrap; }
 .p-bike { background:#e8f5e9; color:#2e7d32; }
 .p-scooter { background:#e3f2fd; color:#0277bd; }
 .p-both { background:#fff3e0; color:#e65100; }
 .p-open { background:#e8f5e9; color:#2e7d32; }
 .p-closed { background:#ffebee; color:#c62828; }
 .p-adm { background:#f5f3ff; color:#7c3aed; border:1px solid rgba(124,58,237,.2); }
-.pc-addr { font-size:.73rem; color:#6b7280; margin-bottom:5px; }
+.pc-addr { font-size:.76rem; color:#6b7280; margin-bottom:6px; line-height:1.4; }
 .pc-meta { display:flex; align-items:center; justify-content:space-between; }
-.pc-stars { display:flex; align-items:center; gap:3px; font-size:.73rem; color:#6b7280; font-family:'Sora',sans-serif; }
+.pc-stars { display:flex; align-items:center; gap:3px; font-size:.74rem; color:#6b7280; font-family:'Inter',sans-serif; }
 .star-txt { color:#f59e0b; }
-.pc-cost { font-size:.71rem; font-family:'Sora',sans-serif; color:#e65100; font-weight:700; }
+.pc-cost { font-size:.73rem; font-family:'Inter',sans-serif; color:#e65100; font-weight:700; }
 .adm-row { display:flex; gap:5px; margin-top:8px; padding-top:8px; border-top:1px solid rgba(124,58,237,.15); }
 .adm-ca { flex:1; padding:6px; border-radius:7px; border:1px solid rgba(124,58,237,.25); background:none; color:#7c3aed; font-family:'Inter',sans-serif; font-size:.72rem; cursor:pointer; text-align:center; }
 .adm-ca.del { border-color:rgba(220,38,38,.3); color:#dc2626; }
@@ -216,20 +216,20 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 /* DETAIL PANEL */
 .detail { position:absolute; inset:0; background:#fff; z-index:100; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .28s ease; }
 .detail.open { transform:translateX(0); }
-.det-hdr { display:flex; align-items:center; gap:10px; padding:13px 14px; border-bottom:1px solid #e2e6ed; flex-shrink:0; }
-.det-back { background:none; border:1.5px solid #e2e6ed; color:#6b7280; padding:5px 10px; border-radius:8px; cursor:pointer; font-family:'Sora',sans-serif; font-size:.67rem; }
-.det-title { font-size:.85rem; font-weight:700; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:'Sora',sans-serif; }
-.det-edit { padding:5px 10px; border-radius:8px; border:1px solid rgba(124,58,237,.25); background:none; color:#7c3aed; font-family:'Inter',sans-serif; font-size:.72rem; cursor:pointer; display:none; }
-.det-body { overflow-y:auto; flex:1; padding:16px; }
-.det-badges { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:9px; }
-.det-addr { font-size:.77rem; color:#6b7280; margin-bottom:13px; }
-.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
-.ibox { background:#f1f3f6; border:1px solid #e2e6ed; border-radius:12px; padding:11px; }
-.ibox-lbl { font-size:.58rem; color:#6b7280; font-family:'Sora',sans-serif; text-transform:uppercase; margin-bottom:4px; }
-.ibox-val { font-size:.92rem; font-weight:700; }
+.det-hdr { display:flex; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid #e2e6ed; flex-shrink:0; }
+.det-back { background:none; border:1.5px solid #e2e6ed; color:#6b7280; padding:7px 12px; border-radius:10px; cursor:pointer; font-family:'Inter',sans-serif; font-size:.75rem; font-weight:600; }
+.det-title { font-size:.92rem; font-weight:700; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:'Sora',sans-serif; }
+.det-edit { padding:6px 12px; border-radius:8px; border:1px solid rgba(124,58,237,.25); background:none; color:#7c3aed; font-family:'Inter',sans-serif; font-size:.75rem; cursor:pointer; display:none; }
+.det-body { overflow-y:auto; flex:1; padding:18px 16px; }
+.det-badges { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+.det-addr { font-size:.83rem; color:#6b7280; margin-bottom:16px; line-height:1.5; }
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.ibox { background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px 12px; }
+.ibox-lbl { font-size:.6rem; color:#94a3b8; font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.8px; margin-bottom:5px; font-weight:700; }
+.ibox-val { font-size:.95rem; font-weight:700; }
 .v-green { color:#2e7d32; } .v-red { color:#c62828; } .v-yellow { color:#f59e0b; } .v-orange { color:#e65100; font-size:.82rem; }
-.contact-block { margin-bottom:14px; }
-.contact-lbl { font-size:.63rem; color:#6b7280; font-family:'Sora',sans-serif; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+.contact-block { margin-bottom:16px; }
+.contact-lbl { font-size:.6rem; color:#94a3b8; font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.8px; margin-bottom:8px; font-weight:700; }
 .contact-link { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; text-decoration:none; margin-bottom:8px; }
 .contact-link-phone { background:#e8f5e9; border:1.5px solid #a5d6a7; color:#1b5e20; }
 .contact-link-web { background:#fce4ec; border:1.5px solid #f48fb1; color:#880e4f; }
@@ -241,17 +241,17 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .h-row { display:flex; justify-content:space-between; padding:7px 10px; border-radius:8px; background:#f1f3f6; font-size:.77rem; }
 .h-row.today { border:1.5px solid #2e7d32; background:#e8f5e9; }
 .h-day { color:#6b7280; } .h-hour { font-family:'Sora',sans-serif; font-size:.68rem; }
-.rev-list { display:flex; flex-direction:column; gap:8px; }
-.rev-card { background:#f1f3f6; border:1px solid #e2e6ed; border-radius:12px; padding:11px; position:relative; }
-.rev-top { display:flex; justify-content:space-between; margin-bottom:3px; }
-.rev-name { font-size:.8rem; font-weight:600; } .rev-stars { color:#f59e0b; font-size:.73rem; }
-.rev-date { font-size:.6rem; color:#6b7280; font-family:'Sora',sans-serif; margin-bottom:5px; }
-.rev-text { font-size:.77rem; color:#374151; line-height:1.5; padding-right:50px; }
-.rev-del { position:absolute; top:10px; right:10px; background:#fff1f1; border:1px solid rgba(220,38,38,.3); color:#dc2626; font-size:.62rem; padding:3px 7px; border-radius:6px; cursor:pointer; font-family:'Sora',sans-serif; display:none; }
-.no-revs { text-align:center; padding:20px; color:#6b7280; font-size:.8rem; }
-.btn-rev { width:100%; margin-top:10px; padding:11px; background:none; border:1.5px dashed #e2e6ed; color:#6b7280; border-radius:12px; cursor:pointer; font-family:'Inter',sans-serif; font-size:.82rem; }
-.btn-rev:hover { border-color:#2e7d32; color:#2e7d32; }
-.btn-dir { width:100%; margin-top:10px; padding:12px; background:#2e7d32; color:#fff; border:none; border-radius:12px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; font-size:.86rem; }
+.rev-list { display:flex; flex-direction:column; gap:10px; }
+.rev-card { background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px; position:relative; }
+.rev-top { display:flex; justify-content:space-between; margin-bottom:4px; }
+.rev-name { font-size:.84rem; font-weight:600; } .rev-stars { color:#f59e0b; font-size:.75rem; }
+.rev-date { font-size:.62rem; color:#94a3b8; font-family:'Inter',sans-serif; margin-bottom:6px; }
+.rev-text { font-size:.8rem; color:#374151; line-height:1.6; padding-right:50px; }
+.rev-del { position:absolute; top:10px; right:10px; background:#fff1f1; border:1px solid rgba(220,38,38,.3); color:#dc2626; font-size:.62rem; padding:3px 7px; border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif; display:none; }
+.no-revs { text-align:center; padding:24px; color:#94a3b8; font-size:.82rem; }
+.btn-rev { width:100%; margin-top:12px; padding:13px; background:none; border:1.5px dashed #e2e8f0; color:#94a3b8; border-radius:14px; cursor:pointer; font-family:'Inter',sans-serif; font-size:.84rem; transition:all .2s; }
+.btn-rev:hover { border-color:#6366f1; color:#6366f1; }
+.btn-dir { width:100%; margin-top:10px; padding:14px; background:linear-gradient(135deg,#2e7d32,#388e3c); color:#fff; border:none; border-radius:14px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; font-size:.88rem; box-shadow:0 4px 12px rgba(46,125,50,.3); }
 
 /* MOBILE SHEET */
 @media (max-width:699px) {
@@ -538,6 +538,23 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
       </div>
       <button id="fab" onclick="startAdd()">＋</button>
       <button id="btn-locate" onclick="locateMe()" title="Mi ubicación">📍</button>
+      <!-- Floating park card -->
+      <div id="map-card" style="display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:400;width:calc(100% - 32px);max-width:340px;background:#fff;border-radius:18px;box-shadow:0 8px 32px rgba(0,0,0,.18);padding:16px;font-family:Inter,sans-serif;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <div style="flex:1;min-width:0;">
+            <div id="mc-name" style="font-family:Sora,sans-serif;font-weight:700;font-size:.95rem;margin-bottom:3px;"></div>
+            <div id="mc-addr" style="font-size:.74rem;color:#94a3b8;"></div>
+          </div>
+          <button onclick="closeMapCard()" style="background:none;border:none;color:#94a3b8;font-size:1.1rem;cursor:pointer;padding:0 0 0 8px;flex-shrink:0;">✕</button>
+        </div>
+        <div id="mc-pills" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;"></div>
+        <div id="mc-info" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;"></div>
+        <div id="mc-phone"></div>
+        <div id="mc-btns" style="display:flex;gap:8px;margin-top:2px;">
+          <button id="mc-dir-btn" style="flex:1;padding:10px;background:#f0f4ff;border:1.5px solid #e0e7ff;color:#6366f1;border-radius:12px;font-family:Inter,sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;text-align:center;">🗺️ Cómo llegar</button>
+          <button onclick="closeMapCard()" style="flex:1;padding:10px;background:#f1f5f9;border:1.5px solid #e2e8f0;color:#64748b;border-radius:12px;font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;text-align:center;">✕ Cerrar</button>
+        </div>
+      </div>
     </div>
     <div class="sidebar" id="sidebar">
       <div class="sb-handle"></div>
@@ -1980,6 +1997,7 @@ function initMap() {
   }).addTo(leafMap);
   L.control.zoom({position: 'bottomright'}).addTo(leafMap);
   leafMap.on('click', onMapClick);
+  leafMap.on('click', function() { closeMapCard(); });
 
   // ── UBICACIÓN DEL USUARIO ──
   if (navigator.geolocation) {
@@ -2307,26 +2325,56 @@ function showPopup(p) {
   if (!mapReady || !mkrs[p.id]) return;
   var open = isOpen(p.schedule);
   var a = avgR(p.reviews);
-  var tc = {bike:'#2e7d32', scooter:'#0277bd', both:'#e65100'}[p.type];
-  var tl = {bike:'🚲 Bicicletas', scooter:'🛴 Monopatines', both:'🚲🛴 Ambos'}[p.type];
-  var html = '<div class="pop-inner">';
-  html += '<div class="pop-type" style="color:' + tc + '">' + tl + '</div>';
-  html += '<div class="pop-name">' + p.name + '</div>';
-  html += '<div class="pop-addr">' + p.addr + '</div>';
-  html += '<div class="pop-pills">';
-  html += '<span class="pill ' + (open ? 'p-open' : 'p-closed') + '">' + (open ? '● Abierto' : '● Cerrado') + '</span> ';
-  html += '<span class="pill p-both">' + dcost(p.cost) + '</span>';
-  if (p.covered) html += ' <span class="pill" style="background:#e0f2fe;color:#0277bd">🏠 Bajo techo</span>';
-  if (a) html += ' <span class="pill" style="background:#fff8e1;color:#f59e0b">★ ' + a + '</span>';
-  if (p.phone) html += '<br><span class="pill p-bike" style="margin-top:3px">📞 ' + p.phone + '</span>';
-  html += '</div>';
-  html += '<button class="pop-btn" onclick="showDetailById(' + p.id + ')">Ver detalles →</button>';
-  html += '</div>';
-  mkrs[p.id].bindPopup(html, {maxWidth: 280}).openPopup();
+  // Show floating card
+  var card = el('map-card');
+  el('mc-name').textContent = p.name;
+  el('mc-addr').textContent = '📍 ' + p.addr;
+  // Pills
+  var typeLbl = {bike:'🚲 Bici', scooter:'🛴 Scooter', both:'🚲🛴 Ambos'}[p.type];
+  var typeCls = {bike:'p-bike', scooter:'p-scooter', both:'p-both'}[p.type];
+  var pillsHtml = '<span class="pill ' + typeCls + '">' + typeLbl + '</span>';
+  pillsHtml += ' <span class="pill ' + (open ? 'p-open' : 'p-closed') + '">' + (open ? '● Abierto' : '● Cerrado') + '</span>';
+  if (p.covered) pillsHtml += ' <span class="pill" style="background:#e0f2fe;color:#0277bd">🏠 Bajo techo</span>';
+  el('mc-pills').innerHTML = pillsHtml;
+  // Info boxes
+  var costTxt = dcost(p.cost).replace(/[🟢💲]/g,'').trim();
+  var infoHtml = '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px;text-align:center;">'
+    + '<div style="font-size:.58rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Costo</div>'
+    + '<div style="font-size:.82rem;font-weight:700;color:#e65100;">' + costTxt + '</div></div>';
+  var typeLbl2 = p.covered ? '🏠 Bajo techo' : '🌤️ Al aire libre';
+  infoHtml += '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px;text-align:center;">'
+    + '<div style="font-size:.58rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Cobertura</div>'
+    + '<div style="font-size:.78rem;font-weight:700;color:#374151;">' + typeLbl2 + '</div></div>';
+  if (a) infoHtml += '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px;text-align:center;">'
+    + '<div style="font-size:.58rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Rating</div>'
+    + '<div style="font-size:.82rem;font-weight:700;color:#f59e0b;">★ ' + a + '</div></div>';
+  el('mc-info').innerHTML = infoHtml;
+  // Phone + Web buttons
+  var contactHtml = '';
+  if (p.phone || p.url) {
+    contactHtml = '<div style="display:flex;gap:6px;margin-bottom:8px;">';
+    if (p.phone) contactHtml += '<a href="tel:' + p.phone + '" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:10px;color:#1b5e20;text-decoration:none;font-family:Inter,sans-serif;font-size:.76rem;font-weight:600;">📞 ' + p.phone + '</a>';
+    if (p.url) contactHtml += '<a href="' + p.url + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;background:#fce4ec;border:1.5px solid #f48fb1;border-radius:10px;color:#880e4f;text-decoration:none;font-family:Inter,sans-serif;font-size:.76rem;font-weight:600;">' + urlIcon(p.url) + ' ' + urlLabel(p.url) + '</a>';
+    contactHtml += '</div>';
+  }
+  el('mc-phone').innerHTML = contactHtml;
+  // Buttons
+  el('mc-dir-btn').onclick = function() { window.open('https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng + '&travelmode=bicycling', '_blank'); };
+  card.style.display = 'block';
+}
+function closeMapCard() {
+  var card = el('map-card');
+  if (card) card.style.display = 'none';
 }
 function showDetailById(id) {
   var p = findPark(id);
-  if (p) { showDetail(p); if (window.innerWidth < 700) expandSheet(); }
+  if (!p) return;
+  selId = id; curId = id;
+  renderAll();
+  showDetail(p);
+  if (window.innerWidth < 700) expandSheet();
+  // Close popup so detail is visible
+  if (mkrs[id]) mkrs[id].closePopup();
 }
 function showDetail(p) {
   curId = p.id;
