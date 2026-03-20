@@ -547,10 +547,10 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
       <div class="fg"><label>Cobertura</label>
         <div style="display:flex;gap:8px;margin-top:6px;">
           <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e6ed;cursor:pointer;font-size:.85rem;font-weight:500;" id="n-covered-yes">
-            <input type="radio" name="n-covered-opt" value="yes" onchange="el('n-covered').checked=true"> ☂️ Cubierto
+            <input type="radio" name="n-covered-opt" value="yes" onchange="el('n-covered').checked=true"> 🏠 Bajo techo
           </label>
           <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e6ed;cursor:pointer;font-size:.85rem;font-weight:500;" id="n-covered-no">
-            <input type="radio" name="n-covered-opt" value="no" checked onchange="el('n-covered').checked=false"> 🌤️ Descubierto
+            <input type="radio" name="n-covered-opt" value="no" checked onchange="el('n-covered').checked=false"> 🌤️ Abierto
           </label>
         </div>
         <input type="checkbox" id="n-covered" style="display:none">
@@ -625,10 +625,10 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
       <div class="fg"><label>Cobertura</label>
         <div style="display:flex;gap:8px;margin-top:6px;">
           <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e6ed;cursor:pointer;font-size:.85rem;font-weight:500;">
-            <input type="radio" name="e-covered-opt" value="yes" onchange="el('e-covered').checked=true"> ☂️ Cubierto
+            <input type="radio" name="e-covered-opt" value="yes" onchange="el('e-covered').checked=true"> 🏠 Bajo techo
           </label>
           <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e6ed;cursor:pointer;font-size:.85rem;font-weight:500;">
-            <input type="radio" name="e-covered-opt" value="no" onchange="el('e-covered').checked=false"> 🌤️ Descubierto
+            <input type="radio" name="e-covered-opt" value="no" onchange="el('e-covered').checked=false"> 🌤️ Abierto
           </label>
         </div>
         <input type="checkbox" id="e-covered" style="display:none">
@@ -1515,7 +1515,7 @@ function showPopup(p) {
   html += '<div class="pop-pills">';
   html += '<span class="pill ' + (open ? 'p-open' : 'p-closed') + '">' + (open ? '● Abierto' : '● Cerrado') + '</span> ';
   html += '<span class="pill p-both">' + dcost(p.cost) + '</span>';
-  if (p.covered) html += ' <span class="pill" style="background:#e0f2fe;color:#0277bd">☂️ Cubierto</span>';
+  if (p.covered) html += ' <span class="pill" style="background:#e0f2fe;color:#0277bd">🏠 Bajo techo</span>';
   if (a) html += ' <span class="pill" style="background:#fff8e1;color:#f59e0b">★ ' + a + '</span>';
   if (p.phone) html += '<br><span class="pill p-bike" style="margin-top:3px">📞 ' + p.phone + '</span>';
   html += '</div>';
@@ -1553,7 +1553,7 @@ function showDetail(p) {
   html += '<div class="info-grid">';
   html += '<div class="ibox"><div class="ibox-lbl">Estado</div><div class="ibox-val ' + (open ? 'v-green' : 'v-red') + '">' + (open ? 'Abierto' : 'Cerrado') + '</div></div>';
   html += '<div class="ibox"><div class="ibox-lbl">Costo</div><div class="ibox-val v-orange">' + dcost(p.cost) + '</div></div>';
-  html += '<div class="ibox"><div class="ibox-lbl">Cobertura</div><div class="ibox-val">' + (p.covered ? '<span style="color:#0277bd">☂️ Cubierto</span>' : '<span style="color:#f59e0b">🌤️ Descubierto</span>') + '</div></div>';
+  html += '<div class="ibox"><div class="ibox-lbl">Tipo</div><div class="ibox-val">' + (p.covered ? '<span style="color:#0277bd">🏠 Bajo techo</span>' : '<span style="color:#f59e0b">🌤️ Abierto</span>') + '</div></div>';
   html += '<div class="ibox" style="grid-column:1/-1"><div class="ibox-lbl">Valoración media</div>';
   if (a) {
     html += '<div class="ibox-val v-yellow">★ ' + a + ' / 5 (' + p.reviews.length + ' opinión' + (p.reviews.length !== 1 ? 'es' : '') + ')</div>';
