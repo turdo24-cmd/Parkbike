@@ -62,16 +62,56 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 
 
 
+/* ── ANIMATIONS ── */
+@keyframes fadeInUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+@keyframes slideInRight { from { transform:translateX(100%); } to { transform:translateX(0); } }
+@keyframes scaleIn { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
+
+.pcard { animation:fadeInUp .25s ease both; }
+.detail.open { animation:slideInRight .28s ease both; }
+
+/* SKELETON LOADING */
+.skeleton { background:linear-gradient(90deg,#f0f4ff 25%,#e0e7ff 50%,#f0f4ff 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:8px; }
+.sk-line { height:12px; margin-bottom:8px; }
+.sk-line.short { width:60%; }
+.sk-line.long { width:90%; }
+.sk-card { padding:13px 16px; border-bottom:1px solid #e2e6ed; }
+.sk-circle { width:36px; height:36px; border-radius:50%; background:linear-gradient(90deg,#f0f4ff 25%,#e0e7ff 50%,#f0f4ff 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; flex-shrink:0; }
+
+/* ONBOARDING */
+#onboarding { position:fixed; inset:0; z-index:99998; background:#f0f4ff; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
+.ob-slide { display:none; flex-direction:column; align-items:center; text-align:center; max-width:340px; width:100%; animation:scaleIn .4s ease; }
+.ob-slide.active { display:flex; }
+.ob-icon { font-size:4rem; margin-bottom:16px; }
+.ob-title { font-family:'Sora',sans-serif; font-size:1.4rem; font-weight:700; color:#0f172a; margin-bottom:8px; }
+.ob-text { font-size:.88rem; color:#64748b; line-height:1.6; margin-bottom:28px; }
+.ob-dots { display:flex; gap:6px; margin-bottom:24px; }
+.ob-dot { width:8px; height:8px; border-radius:50%; background:#e0e7ff; transition:all .3s; }
+.ob-dot.on { background:#6366f1; width:20px; border-radius:4px; }
+.ob-btn { width:100%; max-width:280px; padding:14px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:14px; font-family:'Inter',sans-serif; font-weight:700; font-size:.95rem; cursor:pointer; box-shadow:0 6px 20px rgba(99,102,241,.4); }
+.ob-skip { margin-top:12px; background:none; border:none; color:#94a3b8; font-family:'Inter',sans-serif; font-size:.78rem; cursor:pointer; padding:6px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
 /* ── APP ── */
 #app { display:none; flex-direction:column; height:100%; overflow:hidden; }
-#app.show { display:flex; }
+
 .hdr { height:54px; background:#fff; border-bottom:1px solid #e2e6ed; display:flex; align-items:center; justify-content:space-between; padding:0 14px; flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,.07); z-index:200; }
 .hdr-logo { display:flex; align-items:center; gap:8px; }
 .hdr-icon { width:34px; height:34px; background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 50%,#a855f7 100%); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 4px 12px rgba(99,102,241,.4); transform:rotate(-4deg); }
 .hdr-name { font-family:'Sora',sans-serif; font-weight:700; font-size:.92rem; }
 .hdr-name span { color:#6366f1; }
 .hdr-right { display:flex; align-items:center; gap:6px; }
-.weather-chip { display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:100px; background:#f0f4ff; border:1px solid #e0e7ff; font-size:.78rem; font-weight:600; color:#4338ca; font-family:'Inter',sans-serif; white-space:nowrap; }
+.weather-bar { display:none; align-items:center; gap:8px; padding:6px 14px; background:#f8f9ff; border-bottom:1px solid #e0e7ff; flex-shrink:0; font-family:'Inter',sans-serif; font-size:.76rem; overflow-x:auto; scrollbar-width:none; }
+.weather-bar::-webkit-scrollbar { display:none; }
+.weather-bar.show { display:flex; }
+.wb-pill { display:flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; background:#fff; border:1px solid #e0e7ff; color:#4338ca; font-weight:600; white-space:nowrap; flex-shrink:0; }
+.wb-sep { width:1px; height:14px; background:#e0e7ff; flex-shrink:0; }
+.wb-rain-pill { padding:4px 10px; border-radius:100px; font-weight:700; font-size:.72rem; white-space:nowrap; flex-shrink:0; border:1px solid; }
+.wb-rain-low { background:#f0fdf4; border-color:#bbf7d0; color:#16a34a; }
+.wb-rain-med { background:#fefce8; border-color:#fde047; color:#b45309; }
+.wb-rain-high { background:#fef2f2; border-color:#fecaca; color:#dc2626; }
 .user-chip { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:100px; background:#f0f4ff; border:1px solid #e0e7ff; }
 .user-av { width:28px; height:28px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; color:#fff; font-weight:700; overflow:hidden; flex-shrink:0; min-width:28px; }
 .user-av img { width:28px; height:28px; object-fit:cover; border-radius:50%; display:block; }
@@ -91,13 +131,21 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .adm-btn.red { border-color:rgba(220,38,38,.35); color:#dc2626; }
 
 /* FILTERS */
-.search-bar { padding:8px 12px; background:#fff; border-bottom:1px solid #e2e6ed; flex-shrink:0; }
+.search-bar { padding:8px 12px; background:#fff; border-bottom:1px solid #e2e6ed; flex-shrink:0; position:relative; }
 .search-wrap { position:relative; }
 .search-wrap input { width:100%; padding:9px 12px 9px 36px; background:#f1f3f6; border:1.5px solid #e2e6ed; border-radius:100px; font-family:'Inter',sans-serif; font-size:.85rem; color:#1a1f2e; outline:none; }
-.search-wrap input:focus { border-color:#2e7d32; background:#fff; }
+.search-wrap input:focus { border-color:#6366f1; background:#fff; box-shadow:0 0 0 3px rgba(99,102,241,.08); }
 .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:.9rem; pointer-events:none; }
 .search-clear { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:#9ca3af; cursor:pointer; font-size:.85rem; display:none; padding:2px 4px; }
 .search-clear.show { display:block; }
+.btn-nearest { margin-top:7px; width:100%; padding:9px 14px; background:#f0f4ff; border:1.5px solid #e0e7ff; border-radius:10px; color:#6366f1; font-family:Inter,sans-serif; font-size:.78rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all .2s; }
+.btn-nearest:hover { background:#e0e7ff; border-color:#c7d2fe; }
+
+@media (min-width:700px) {
+  .search-bar { padding:10px 16px; display:flex; align-items:center; gap:10px; }
+  .search-wrap { flex:1; max-width:380px; }
+  .btn-nearest { width:auto; margin-top:0; padding:9px 16px; white-space:nowrap; flex-shrink:0; border-radius:100px; }
+}
 .filters { height:46px; background:#fff; border-bottom:1px solid #e2e6ed; display:flex; align-items:center; gap:6px; padding:0 12px; flex-shrink:0; overflow-x:auto; scrollbar-width:none; }
 .filters::-webkit-scrollbar { display:none; }
 .fbtn { display:flex; align-items:center; gap:5px; padding:5px 12px; border-radius:100px; border:1.5px solid #e2e6ed; background:none; color:#6b7280; font-family:'Inter',sans-serif; font-size:.78rem; font-weight:500; cursor:pointer; white-space:nowrap; flex-shrink:0; }
@@ -282,6 +330,38 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 </head>
 <body>
 
+<!-- ═══ ONBOARDING ═══ -->
+<div id="onboarding" style="display:none;">
+  <div class="ob-slide active" id="ob-0">
+    <div class="ob-icon">🚲</div>
+    <div class="ob-title">Bienvenido a ParkBike</div>
+    <div class="ob-text">Tu guía de estacionamientos para bicicletas y monopatines en Montevideo.</div>
+  </div>
+  <div class="ob-slide" id="ob-1">
+    <div class="ob-icon">🗺️</div>
+    <div class="ob-title">Encontrá parkings</div>
+    <div class="ob-text">Explorá el mapa interactivo, filtrá por tipo y encontrá el parking más cercano a vos.</div>
+  </div>
+  <div class="ob-slide" id="ob-2">
+    <div class="ob-icon">⭐</div>
+    <div class="ob-title">Guardá tus favoritos</div>
+    <div class="ob-text">Marcá los parkings que más usás y accedé a ellos rápidamente desde tu perfil.</div>
+  </div>
+  <div class="ob-slide" id="ob-3">
+    <div class="ob-icon">💬</div>
+    <div class="ob-title">Compartí tu experiencia</div>
+    <div class="ob-text">Dejá opiniones, reportá problemas y ayudá a la comunidad ciclista de Montevideo.</div>
+  </div>
+  <div class="ob-dots">
+    <div class="ob-dot on" id="ob-dot-0"></div>
+    <div class="ob-dot" id="ob-dot-1"></div>
+    <div class="ob-dot" id="ob-dot-2"></div>
+    <div class="ob-dot" id="ob-dot-3"></div>
+  </div>
+  <button class="ob-btn" id="ob-next-btn" onclick="obNext()">Siguiente →</button>
+  <button class="ob-skip" onclick="obSkip()">Saltar</button>
+</div>
+
 <!-- ═══ AUTH ═══ -->
 <div id="auth">
   <div class="a-wrap">
@@ -312,7 +392,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
         <div class="a-field"><label>Contraseña</label><input type="password" id="l-pwd" placeholder="••••••••" autocomplete="current-password"></div>
         <div class="a-err" id="l-err"></div>
         <button class="a-btn" onclick="doLogin()">Entrar →</button>
-        <div class="a-note">¿No tenés cuenta? Tocá Registrarse.<br><span class="a-demo" style="cursor:pointer;text-decoration:underline;" onclick="fillDemo()">▶ Entrar con cuenta demo</span></div>
+        <div class="a-note">¿No tenés cuenta? Tocá Registrarse.<br><span class="a-demo" style="cursor:pointer;text-decoration:underline;" onclick="fillDemo()">▶ Entrar con cuenta demo</span><br><span style="color:#c4b5fd;font-size:.65rem;cursor:pointer;" onclick="localStorage.removeItem('ob_done');location.reload();">Ver introducción</span></div>
       </div>
       <!-- REGISTER -->
       <div id="tab-reg" style="display:none">
@@ -360,7 +440,6 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
       <div class="hdr-name">Park<span>Bike</span></div>
     </div>
     <div class="hdr-right">
-      <div class="weather-chip" id="weather-chip">🌤 --°C</div>
       <div class="user-chip" onclick="openProfile()" style="cursor:pointer;" title="Mi perfil">
         <div class="user-av" id="user-av">?</div>
         <div class="user-nm" id="user-nm">Usuario</div>
@@ -379,13 +458,25 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
       <button class="adm-btn red" onclick="logoutAdmin()">Salir</button>
     </div>
   </div>
+  <!-- Weather bar -->
+  <div class="weather-bar" id="weather-bar">
+    <div class="wb-pill" id="wb-temp-pill">⏳ --°C</div>
+    <div class="wb-sep"></div>
+    <div class="wb-pill" id="wb-cond-pill">--</div>
+    <div class="wb-sep"></div>
+    <div class="wb-pill" id="wb-wind-pill">💨 -- km/h</div>
+    <div class="wb-sep"></div>
+    <div class="wb-rain-pill wb-rain-low" id="wb-rain-pill">💧 --%</div>
+  </div>
   <!-- Search -->
   <div class="search-bar">
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="Buscar parking por nombre o barrio…" oninput="onSearch(this.value)" autocomplete="off" autocorrect="off" autocapitalize="none">
+      <input type="text" id="search-input" placeholder="Buscar parking por nombre o barrio…" oninput="onSearch(this.value)" onfocus="showSuggestions()" onblur="hideSuggestions()" autocomplete="off" autocorrect="off" autocapitalize="none">
       <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
     </div>
+    <div id="search-suggestions" style="display:none;position:absolute;left:12px;right:12px;top:100%;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:500;max-height:260px;overflow-y:auto;border:1px solid #e2e8f0;"></div>
+    <button id="btn-nearest" class="btn-nearest" onclick="findNearest()">📍 Parking más cercano</button>
   </div>
   <!-- Filters -->
   <div class="filters">
@@ -401,6 +492,10 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   <div class="content">
     <div style="position:relative;flex:1;min-height:0;height:100%;display:flex;flex-direction:column;">
       <div id="map"></div>
+      <div id="map-skeleton" style="position:absolute;inset:0;background:linear-gradient(135deg,#f0f4ff,#e0e7ff);z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity .5s;">
+        <div style="width:48px;height:48px;border-radius:50%;border:4px solid #e0e7ff;border-top-color:#6366f1;animation:spin .8s linear infinite;"></div>
+        <div style="font-family:Inter,sans-serif;font-size:.82rem;color:#94a3b8;font-weight:500;">Cargando mapa…</div>
+      </div>
       <div id="map-banner">
         <span id="ban-txt"></span>
         <button class="ban-cancel" id="ban-cancel">✕ Cancelar</button>
@@ -413,6 +508,13 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
       <div class="sb-head" onclick="toggleSheet()">
         <div class="sb-title">📍 Parkings en Montevideo</div>
         <div class="sb-count" id="sb-count">Cargando…</div>
+      </div>
+      <div id="recent-section" style="display:none;padding:10px 14px 0;border-bottom:1px solid #e2e6ed;">
+        <div style="font-size:.63rem;color:#94a3b8;font-family:Sora,sans-serif;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">🕐 Vistos recientemente</div>
+        <div id="recent-list" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;"></div>
+      </div>
+      <div style="padding:8px 14px;border-bottom:1px solid #e2e6ed;">
+        <button onclick="openSuggest()" style="width:100%;padding:9px;background:#f0f4ff;border:1.5px dashed #c7d2fe;border-radius:10px;color:#6366f1;font-family:Inter,sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;">＋ Sugerir un parking</button>
       </div>
       <div class="park-list" id="park-list"></div>
       <!-- Detail -->
@@ -501,6 +603,53 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
     <button onclick="closeOv('ov-profile');doLogout();" style="width:100%;margin-top:16px;padding:12px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#6b7280;border-radius:12px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:.88rem;">🚪 Cerrar sesión</button>
   </div>
 </div>
+
+<!-- REPORT PROBLEM -->
+<div class="ov" id="ov-report">
+  <div class="modal">
+    <h2>⚠️ Reportar problema</h2>
+    <p class="modal-sub" id="report-park-name"></p>
+    <div class="fg">
+      <label>¿Cuál es el problema?</label>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+        <label class="veh-opt" id="rep-1-lbl" onclick="toggleVeh('rep-1',this)"><input type="checkbox" id="rep-1" style="display:none"><span class="veh-dot" style="background:#fef9c3;border-color:#fde047;"></span><span>🔒 Está cerrado / no existe</span></label>
+        <label class="veh-opt" id="rep-2-lbl" onclick="toggleVeh('rep-2',this)"><input type="checkbox" id="rep-2" style="display:none"><span class="veh-dot" style="background:#fef9c3;border-color:#fde047;"></span><span>📍 La ubicación es incorrecta</span></label>
+        <label class="veh-opt" id="rep-3-lbl" onclick="toggleVeh('rep-3',this)"><input type="checkbox" id="rep-3" style="display:none"><span class="veh-dot" style="background:#fef9c3;border-color:#fde047;"></span><span>🚲 No tiene lugares disponibles</span></label>
+        <label class="veh-opt" id="rep-4-lbl" onclick="toggleVeh('rep-4',this)"><input type="checkbox" id="rep-4" style="display:none"><span class="veh-dot" style="background:#fef9c3;border-color:#fde047;"></span><span>⚠️ Está dañado o en mal estado</span></label>
+        <label class="veh-opt" id="rep-5-lbl" onclick="toggleVeh('rep-5',this)"><input type="checkbox" id="rep-5" style="display:none"><span class="veh-dot" style="background:#fef9c3;border-color:#fde047;"></span><span>📝 Otro</span></label>
+      </div>
+    </div>
+    <div class="fg"><label>Comentario (opcional)</label><textarea id="report-comment" placeholder="Contanos más detalles…" style="resize:none;height:70px;"></textarea></div>
+    <div class="mact">
+      <button class="btn-cancel" onclick="closeOv('ov-report')">Cancelar</button>
+      <button class="btn-save" style="background:linear-gradient(135deg,#f59e0b,#f97316);" onclick="saveReport()">Enviar reporte</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUGGEST PARKING -->
+<div class="ov" id="ov-suggest">
+  <div class="modal">
+    <h2>💡 Sugerir un parking</h2>
+    <p class="modal-sub">Tu sugerencia será revisada por el administrador.</p>
+    <div class="fg"><label>Nombre del parking *</label><input type="text" id="sug-name" placeholder="Ej: Rack Plaza Varela" autocapitalize="words"></div>
+    <div class="fg"><label>Dirección *</label><input type="text" id="sug-addr" placeholder="Calle y número, barrio" autocapitalize="words"></div>
+    <div class="fg"><label>Tipo</label>
+      <select id="sug-type">
+        <option value="bike">🚲 Bicicletas</option>
+        <option value="scooter">🛴 Monopatines</option>
+        <option value="both">🚲🛴 Ambos</option>
+      </select>
+    </div>
+    <div class="fg"><label>Comentario (opcional)</label><textarea id="sug-comment" placeholder="Cualquier detalle útil…" style="resize:none;height:70px;"></textarea></div>
+    <div class="perr" id="sug-err"></div>
+    <div class="mact">
+      <button class="btn-cancel" onclick="closeOv('ov-suggest')">Cancelar</button>
+      <button class="btn-save" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);" onclick="saveSuggest()">Enviar sugerencia</button>
+    </div>
+  </div>
+</div>
+
 <div class="ov" id="ov-adm-login">
   <div class="modal adm">
     <h2>🔐 Acceso administrador</h2>
@@ -538,7 +687,11 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
     <button class="btn-pickmap" id="btn-pickmap" onclick="pickOnMap()">📍 Tocar el mapa para ubicar</button>
     <div class="hint-blue" id="add-hint" style="display:none"></div>
     <div class="fg"><label>Nombre</label><input type="text" id="n-name" placeholder="Ej: Rack Plaza Cagancha"></div>
-    <div class="fg"><label>Dirección</label><input type="text" id="n-addr" placeholder="Calle y número, barrio"></div>
+    <div class="fg" style="position:relative;">
+      <label>Dirección</label>
+      <input type="text" id="n-addr" placeholder="Escribí la dirección para buscar…" oninput="searchAddr('n')" onblur="hideAddrSug('n')" autocomplete="off">
+      <div id="n-addr-sug" style="display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:600;max-height:180px;overflow-y:auto;border:1px solid #e2e8f0;"></div>
+    </div>
     <div class="frow">
       <div class="fg"><label>Tipo</label>
         <select id="n-type">
@@ -598,6 +751,12 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
     </div>
     <div class="fg"><label>Teléfono (opcional)</label><input type="tel" id="n-phone" placeholder="Ej: 099 123 456" inputmode="tel"></div>
     <div class="fg"><label>Web / Instagram / Facebook</label><input type="text" id="n-url" placeholder="https://instagram.com/miparking" autocorrect="off" autocapitalize="none"></div>
+    <div class="fg">
+      <label>Fotos del parking</label>
+      <div id="n-photos-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;"></div>
+      <button type="button" onclick="el('n-photo-input').click()" style="margin-top:8px;padding:8px 14px;border:1.5px dashed #c7d2fe;background:#f0f4ff;color:#6366f1;border-radius:10px;font-family:Inter,sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;width:100%;">📷 Agregar foto</button>
+      <input type="file" id="n-photo-input" accept="image/*" style="display:none" onchange="handleNewParkPhoto(this)">
+    </div>
     <div class="frow">
       <div class="fg"><label>Latitud</label><input type="number" id="n-lat" placeholder="-34.9058" step="0.0001"></div>
       <div class="fg"><label>Longitud</label><input type="number" id="n-lng" placeholder="-56.1913" step="0.0001"></div>
@@ -616,7 +775,11 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
     <p class="modal-sub">Modificá los datos del parking.</p>
     <input type="hidden" id="e-id">
     <div class="fg"><label>Nombre</label><input type="text" id="e-name"></div>
-    <div class="fg"><label>Dirección</label><input type="text" id="e-addr"></div>
+    <div class="fg" style="position:relative;">
+      <label>Dirección</label>
+      <input type="text" id="e-addr" oninput="searchAddr('e')" onblur="hideAddrSug('e')" autocomplete="off">
+      <div id="e-addr-sug" style="display:none;position:absolute;left:0;right:0;top:100%;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:600;max-height:180px;overflow-y:auto;border:1px solid #e2e8f0;"></div>
+    </div>
     <div class="frow">
       <div class="fg"><label>Tipo</label>
         <select id="e-type">
@@ -676,6 +839,12 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
     </div>
     <div class="fg"><label>Teléfono (opcional)</label><input type="tel" id="e-phone" placeholder="Ej: 099 123 456" inputmode="tel"></div>
     <div class="fg"><label>Web / Instagram / Facebook</label><input type="text" id="e-url" placeholder="https://instagram.com/miparking" autocorrect="off" autocapitalize="none"></div>
+    <div class="fg">
+      <label>Fotos del parking</label>
+      <div id="e-photos-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;"></div>
+      <button type="button" onclick="el('e-photo-input').click()" style="margin-top:8px;padding:8px 14px;border:1.5px dashed #c7d2fe;background:#f0f4ff;color:#6366f1;border-radius:10px;font-family:Inter,sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;width:100%;">📷 Agregar foto</button>
+      <input type="file" id="e-photo-input" accept="image/*" style="display:none" onchange="handleParkPhoto(this)">
+    </div>
     <div class="hint-purple">📍 Para mover la ubicación en el mapa usá el botón "Reubicar" en la tarjeta.</div>
     <div class="mact">
       <button class="btn-cancel" onclick="closeOv('ov-edit')">Cancelar</button>
@@ -794,6 +963,12 @@ var parks = JSON.parse(localStorage.getItem('parks')) || [
    reviews:[{name:'Diego R.',rating:3,text:'Funcional pero podría estar mejor.',date:Date.now()-86400000*20}]}
 ];
 
+// Initialize nxtId above all existing park IDs
+nxtId = parseInt(localStorage.getItem('nxtId') || '500');
+for (var _i = 0; _i < parks.length; _i++) {
+  if (parks[_i].id >= nxtId) nxtId = parks[_i].id + 1;
+}
+
 // ═══════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════
@@ -902,22 +1077,488 @@ function placeUserMarker(lat, lng) {
   }).addTo(leafMap).bindPopup('<div style="font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;padding:4px 2px;">📍 Tu ubicación</div>');
 }
 
+function openPhotoViewer(idx, parkId) {
+  var p = findPark(parkId);
+  if (!p || !p.photos) return;
+  var ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:99999;display:flex;align-items:center;justify-content:center;';
+  ov.onclick = function() { ov.remove(); };
+  ov.innerHTML = '<img src="' + p.photos[idx] + '" style="max-width:95vw;max-height:90vh;border-radius:12px;object-fit:contain;">'
+    + '<button style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer;">✕</button>';
+  document.body.appendChild(ov);
+}
+
+// ═══════════════════════════════════════════════════
+// ADDRESS AUTOCOMPLETE
+// ═══════════════════════════════════════════════════
+var addrTimeout = {};
+function searchAddr(prefix) {
+  var val = el(prefix + '-addr').value.trim();
+  var sug = el(prefix + '-addr-sug');
+  if (val.length < 3) { sug.style.display = 'none'; return; }
+  clearTimeout(addrTimeout[prefix]);
+  addrTimeout[prefix] = setTimeout(function() {
+    var q = val + ', Montevideo, Uruguay';
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&q=' + encodeURIComponent(q))
+      .then(function(r) { return r.json(); })
+      .then(function(results) {
+        if (!results.length) { sug.style.display = 'none'; return; }
+        sug.innerHTML = results.map(function(r) {
+          var display = r.display_name.replace(', Uruguay', '').replace(', Montevideo', '');
+          return '<div style="padding:10px 14px;cursor:pointer;font-size:.82rem;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;color:#1a1f2e;" '
+            + 'onmousedown="pickAddr(\'' + prefix + '\',' + r.lat + ',' + r.lon + ',\'' + display.replace(/'/g, '') + '\')">'
+            + '📍 ' + display + '</div>';
+        }).join('');
+        sug.style.display = 'block';
+      })
+      .catch(function() { sug.style.display = 'none'; });
+  }, 400);
+}
+function pickAddr(prefix, lat, lng, display) {
+  el(prefix + '-addr').value = display;
+  el(prefix + '-addr-sug').style.display = 'none';
+  // Also set coordinates
+  if (prefix === 'n') {
+    pendingLat = parseFloat(lat);
+    pendingLng = parseFloat(lng);
+    el('n-lat').value = parseFloat(lat).toFixed(5);
+    el('n-lng').value = parseFloat(lng).toFixed(5);
+    el('btn-pickmap').textContent = '✅ Ubicación encontrada: ' + parseFloat(lat).toFixed(4) + ', ' + parseFloat(lng).toFixed(4);
+    el('btn-pickmap').classList.add('picked');
+    // Place marker on map
+    if (leafMap) {
+      if (tmpMkr) leafMap.removeLayer(tmpMkr);
+      tmpMkr = L.marker([lat, lng], { icon: mkIcon('bike', false, true) }).addTo(leafMap);
+      leafMap.flyTo([lat, lng], 17, { duration: 0.8 });
+    }
+  }
+}
+function hideAddrSug(prefix) {
+  setTimeout(function() {
+    var sug = el(prefix + '-addr-sug');
+    if (sug) sug.style.display = 'none';
+  }, 200);
+}
+
+// ═══════════════════════════════════════════════════
+// FOTOS NUEVO PARKING
+// ═══════════════════════════════════════════════════
+var newParkPhotos = [];
+function handleNewParkPhoto(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert('Imagen demasiado grande. Máximo 5MB.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var maxW = 600; var ratio = Math.min(maxW / img.width, maxW / img.height, 1);
+      canvas.width = img.width * ratio; canvas.height = img.height * ratio;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      newParkPhotos.push(dataUrl);
+      renderNewPhotoPreview();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+function renderNewPhotoPreview() {
+  var container = el('n-photos-preview');
+  if (!container) return;
+  container.innerHTML = newParkPhotos.map(function(ph, i) {
+    return '<div style="position:relative;width:70px;height:70px;border-radius:10px;overflow:hidden;flex-shrink:0;">'
+      + '<img src="' + ph + '" style="width:100%;height:100%;object-fit:cover;">'
+      + '<button onclick="newParkPhotos.splice(' + i + ',1);renderNewPhotoPreview();" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:.65rem;cursor:pointer;">✕</button>'
+      + '</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// FOTOS DE PARKINGS (EDIT)
+// ═══════════════════════════════════════════════════
+function handleParkPhoto(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert('Imagen demasiado grande. Máximo 5MB.'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var maxW = 600; var ratio = Math.min(maxW / img.width, maxW / img.height, 1);
+      canvas.width = img.width * ratio;
+      canvas.height = img.height * ratio;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      var p = findPark(parseInt(el('e-id').value));
+      if (!p) return;
+      if (!p.photos) p.photos = [];
+      p.photos.push(dataUrl);
+      renderPhotoPreview(p.photos);
+      localStorage.setItem('parks', JSON.stringify(parks));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+function renderPhotoPreview(photos) {
+  var container = el('e-photos-preview');
+  if (!container) return;
+  if (!photos || !photos.length) { container.innerHTML = ''; return; }
+  container.innerHTML = photos.map(function(ph, i) {
+    return '<div style="position:relative;width:70px;height:70px;border-radius:10px;overflow:hidden;flex-shrink:0;">'
+      + '<img src="' + ph + '" style="width:100%;height:100%;object-fit:cover;">'
+      + '<button onclick="removeParkPhoto(' + i + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>'
+      + '</div>';
+  }).join('');
+}
+function removeParkPhoto(idx) {
+  var p = findPark(parseInt(el('e-id').value));
+  if (!p || !p.photos) return;
+  p.photos.splice(idx, 1);
+  renderPhotoPreview(p.photos);
+  localStorage.setItem('parks', JSON.stringify(parks));
+}
+
+// ═══════════════════════════════════════════════════
+// SUGERIR PARKING
+// ═══════════════════════════════════════════════════
+function openSuggest() {
+  el('sug-name').value = ''; el('sug-addr').value = ''; el('sug-comment').value = '';
+  el('sug-err').textContent = '';
+  openOv('ov-suggest');
+}
+function saveSuggest() {
+  var name = el('sug-name').value.trim();
+  var addr = el('sug-addr').value.trim();
+  if (!name || !addr) { el('sug-err').textContent = 'Completá nombre y dirección.'; return; }
+  var suggestions = JSON.parse(localStorage.getItem('suggestions') || '[]');
+  suggestions.push({
+    name: name, addr: addr,
+    type: el('sug-type').value,
+    comment: el('sug-comment').value.trim(),
+    date: Date.now(),
+    user: currentUser ? currentUser.name : 'Anónimo',
+    status: 'pending'
+  });
+  localStorage.setItem('suggestions', JSON.stringify(suggestions));
+  closeOv('ov-suggest');
+  alert('✅ ¡Gracias! Tu sugerencia fue enviada al administrador.');
+}
+
+// ═══════════════════════════════════════════════════
+// PARKINGS RECIENTES
+// ═══════════════════════════════════════════════════
+function getRecent() {
+  if (!currentUser) return [];
+  return JSON.parse(localStorage.getItem('recent_' + currentUser.email) || '[]');
+}
+function addRecent(id) {
+  if (!currentUser) return;
+  var recent = getRecent().filter(function(r) { return r !== id; });
+  recent.unshift(id);
+  if (recent.length > 5) recent = recent.slice(0, 5);
+  localStorage.setItem('recent_' + currentUser.email, JSON.stringify(recent));
+  renderRecent();
+}
+function renderRecent() {
+  var recent = getRecent().map(function(id) { return findPark(id); }).filter(Boolean);
+  var section = el('recent-section');
+  var list = el('recent-list');
+  if (!recent.length || !section || !list) { if (section) section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  list.innerHTML = recent.map(function(p) {
+    var open = isOpen(p.schedule);
+    var color = {bike:'#2e7d32', scooter:'#0277bd', both:'#e65100'}[p.type];
+    return '<div onclick="selectPark(' + p.id + ')" style="flex-shrink:0;padding:8px 12px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;cursor:pointer;min-width:130px;max-width:160px;">'
+      + '<div style="font-size:.72rem;font-weight:600;font-family:Sora,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1a1f2e;">' + p.name + '</div>'
+      + '<div style="font-size:.65rem;color:#94a3b8;margin-top:2px;">' + (open ? '<span style="color:#2e7d32">● Abierto</span>' : '<span style="color:#c62828">● Cerrado</span>') + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// ONBOARDING
+// ═══════════════════════════════════════════════════
+var obStep = 0;
+var obTotal = 4;
+function showOnboarding() {
+  if (localStorage.getItem('ob_done')) return;
+  // Hide auth while onboarding shows
+  el('auth').style.display = 'none';
+  el('onboarding').style.display = 'flex';
+  obStep = 0;
+  for (var i = 0; i < obTotal; i++) {
+    var slide = el('ob-' + i);
+    var dot = el('ob-dot-' + i);
+    if (slide) slide.classList.toggle('active', i === 0);
+    if (dot) dot.classList.toggle('on', i === 0);
+  }
+  var btn = el('ob-next-btn');
+  if (btn) btn.textContent = 'Siguiente →';
+}
+function obNext() {
+  obStep++;
+  if (obStep >= obTotal) { obFinish(); return; }
+  for (var i = 0; i < obTotal; i++) {
+    var slide = el('ob-' + i);
+    var dot = el('ob-dot-' + i);
+    if (slide) slide.classList.toggle('active', i === obStep);
+    if (dot) dot.classList.toggle('on', i === obStep);
+  }
+  var btn = el('ob-next-btn');
+  if (btn) btn.textContent = obStep === obTotal - 1 ? '¡Empezar! 🚲' : 'Siguiente →';
+}
+function obSkip() { obFinish(); }
+function obFinish() {
+  localStorage.setItem('ob_done', '1');
+  var ob = el('onboarding');
+  ob.style.opacity = '0';
+  ob.style.transition = 'opacity .4s';
+  setTimeout(function() {
+    ob.style.display = 'none';
+    el('auth').style.display = 'flex';
+  }, 400);
+}
+
+// ── SHARE WHATSAPP ──
+function shareWhatsApp(id) {
+  var p = findPark(id);
+  if (!p) return;
+  var open = isOpen(p.schedule);
+  var cost = dcost(p.cost).replace(/[🟢💲]/g, '').trim();
+  var text = '🚲 *' + p.name + '*\n'
+    + '📍 ' + p.addr + '\n'
+    + (open ? '✅ Abierto ahora' : '❌ Cerrado ahora') + '\n'
+    + '💲 ' + cost + '\n'
+    + '🗺️ https://maps.google.com/?q=' + p.lat + ',' + p.lng + '\n'
+    + '\nVía ParkBike 🚲 turdo24-cmd.github.io/Parkbike';
+  var url = 'https://wa.me/?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+
+// ═══════════════════════════════════════════════════
+// REPORT PROBLEM
+// ═══════════════════════════════════════════════════
+var reportTarget = null;
+function openReport(id) {
+  reportTarget = id;
+  var p = findPark(id);
+  if (!p) return;
+  el('report-park-name').textContent = p.name;
+  el('report-comment').value = '';
+  // Reset checkboxes
+  for (var i = 1; i <= 5; i++) {
+    var cb = el('rep-' + i); if (cb) cb.checked = false;
+    var lbl = el('rep-' + i + '-lbl'); if (lbl) lbl.classList.remove('on');
+  }
+  openOv('ov-report');
+}
+function saveReport() {
+  var p = findPark(reportTarget);
+  if (!p) return;
+  var problems = [];
+  var labels = ['Está cerrado / no existe', 'La ubicación es incorrecta', 'No tiene lugares disponibles', 'Está dañado o en mal estado', 'Otro'];
+  for (var i = 1; i <= 5; i++) {
+    var cb = el('rep-' + i);
+    if (cb && cb.checked) problems.push(labels[i-1]);
+  }
+  if (!problems.length) { alert('Seleccioná al menos un problema.'); return; }
+  if (!p.reports) p.reports = [];
+  p.reports.push({ problems: problems, comment: el('report-comment').value.trim(), date: Date.now(), user: currentUser ? currentUser.name : 'Anónimo' });
+  localStorage.setItem('parks', JSON.stringify(parks));
+  closeOv('ov-report');
+  alert('✅ Gracias por tu reporte. Lo revisaremos pronto.');
+}
+
+// ═══════════════════════════════════════════════════
+// NEAREST PARKING
+// ═══════════════════════════════════════════════════
+function findNearest() {
+  var btn = el('btn-nearest');
+  if (btn) { btn.textContent = '⏳ Buscando…'; btn.disabled = true; }
+  if (!navigator.geolocation) { alert('Tu dispositivo no soporta geolocalización.'); resetNearestBtn(); return; }
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var lat = pos.coords.latitude;
+    var lng = pos.coords.longitude;
+    var best = null; var bestDist = Infinity;
+    for (var i = 0; i < parks.length; i++) {
+      var d = Math.sqrt(Math.pow(parks[i].lat - lat, 2) + Math.pow(parks[i].lng - lng, 2));
+      if (d < bestDist) { bestDist = d; best = parks[i]; }
+    }
+    resetNearestBtn();
+    if (best) selectPark(best.id);
+  }, function() {
+    resetNearestBtn();
+    alert('No se pudo obtener tu ubicación.');
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
+function resetNearestBtn() {
+  var btn = el('btn-nearest');
+  if (btn) { btn.textContent = '📍 Parking más cercano'; btn.disabled = false; }
+}
+
+// ═══════════════════════════════════════════════════
+// AUTOCOMPLETE SEARCH
+// ═══════════════════════════════════════════════════
+var suggestionsTimeout = null;
+function showSuggestions() {
+  var val = el('search-input').value.trim();
+  if (val.length < 1) {
+    // Show recent searches + top barrios
+    var html = '<div style="padding:6px 14px 4px;font-size:.62rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">Barrios</div>';
+    var barrios = ['Centro', 'Ciudad Vieja', 'Pocitos', 'Punta Carretas', 'Malvín', 'Buceo', 'Parque Rodó', 'Tres Cruces', 'Aguada', 'Cordón', 'Carrasco', 'La Teja'];
+    html += barrios.map(function(b) {
+      return '<div style="padding:9px 14px;cursor:pointer;font-size:.84rem;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;color:#374151;" onmousedown="pickSuggestion(\'\',\'' + b + '\')">🏘️ ' + b + '</div>';
+    }).join('');
+    var sug = el('search-suggestions');
+    sug.innerHTML = html;
+    sug.style.display = 'block';
+    return;
+  }
+  var ql = val.toLowerCase();
+  var results = [];
+  // Search parks by name and address
+  for (var i = 0; i < parks.length; i++) {
+    var p = parks[i];
+    if (p.name.toLowerCase().indexOf(ql) > -1 || p.addr.toLowerCase().indexOf(ql) > -1) {
+      var open = isOpen(p.schedule);
+      results.push({ type: 'park', label: p.name, sub: p.addr, id: p.id, open: open });
+      if (results.length >= 5) break;
+    }
+  }
+  // Also search barrios
+  var barrios2 = ['Centro', 'Ciudad Vieja', 'Pocitos', 'Punta Carretas', 'Malvín', 'Buceo', 'Parque Rodó', 'Tres Cruces', 'Aguada', 'Cordón', 'Carrasco', 'La Teja'];
+  var barResults = barrios2.filter(function(b) { return b.toLowerCase().indexOf(ql) > -1; });
+  var sug = el('search-suggestions');
+  if (!results.length && !barResults.length) { sug.style.display = 'none'; return; }
+  var html = '';
+  if (results.length) {
+    html += '<div style="padding:6px 14px 4px;font-size:.62rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">Parkings</div>';
+    html += results.map(function(r) {
+      return '<div style="padding:9px 14px;cursor:pointer;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;" onmousedown="pickSuggestion(\'' + r.id + '\',\'\')">'
+        + '<div style="font-size:.84rem;font-weight:600;color:#1a1f2e;">' + r.label + '</div>'
+        + '<div style="font-size:.72rem;color:#94a3b8;margin-top:1px;">' + r.sub + ' · <span style="color:' + (r.open ? '#2e7d32' : '#c62828') + '">' + (r.open ? '● Abierto' : '● Cerrado') + '</span></div>'
+        + '</div>';
+    }).join('');
+  }
+  if (barResults.length) {
+    html += '<div style="padding:6px 14px 4px;font-size:.62rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">Barrios</div>';
+    html += barResults.map(function(b) {
+      return '<div style="padding:9px 14px;cursor:pointer;font-size:.84rem;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;color:#374151;" onmousedown="pickSuggestion(\'\',\'' + b + '\')">🏘️ ' + b + '</div>';
+    }).join('');
+  }
+  sug.innerHTML = html;
+  sug.style.display = 'block';
+}
+function hideSuggestions() {
+  setTimeout(function() {
+    var s = el('search-suggestions');
+    if (s) s.style.display = 'none';
+  }, 200);
+}
+function getBarrios() {
+  var barrios = ['Centro', 'Ciudad Vieja', 'Pocitos', 'Punta Carretas', 'Malvín', 'Buceo', 'Parque Rodó', 'Tres Cruces', 'Aguada', 'Cordón', 'Carrasco', 'La Teja'];
+  return barrios.map(function(b) { return { label: '🏘️ ' + b, value: b }; }).slice(0, 6);
+}
+function getSuggestions(q) {
+  var results = [];
+  var ql = q.toLowerCase();
+  for (var i = 0; i < parks.length; i++) {
+    var p = parks[i];
+    if (p.name.toLowerCase().indexOf(ql) > -1 || p.addr.toLowerCase().indexOf(ql) > -1) {
+      results.push({ label: '📍 ' + p.name, value: p.name, id: p.id });
+      if (results.length >= 6) break;
+    }
+  }
+  return results;
+}
+function renderSuggestions(items) {
+  var s = el('search-suggestions');
+  if (!items.length) { s.style.display = 'none'; return; }
+  var html = '';
+  items.forEach(function(item) {
+    html += '<div style="padding:10px 14px;cursor:pointer;font-size:.85rem;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;" '
+      + 'onmousedown="pickSuggestion(\'' + (item.id || '') + '\',\'' + item.value.replace(/'/g, '') + '\')">'
+      + item.label + '</div>';
+  });
+  s.innerHTML = html;
+  s.style.display = 'block';
+}
+function pickSuggestion(id, value) {
+  var sug = el('search-suggestions');
+  if (sug) sug.style.display = 'none';
+  if (id) {
+    // Direct park selection
+    clearSearch();
+    selectPark(parseInt(id));
+  } else {
+    // Text search
+    el('search-input').value = value;
+    el('search-clear').classList.add('show');
+    onSearch(value);
+  }
+}
+
 // ── WEATHER ──
 function fetchWeather() {
-  var url = 'https://api.open-meteo.com/v1/forecast?latitude=-34.9058&longitude=-56.1650&current=temperature_2m,weathercode,windspeed_10m&timezone=America/Montevideo';
+  var url = 'https://api.open-meteo.com/v1/forecast?latitude=-34.9058&longitude=-56.1650'
+    + '&current=temperature_2m,weathercode,windspeed_10m'
+    + '&daily=precipitation_probability_max,weathercode'
+    + '&timezone=America/Montevideo&forecast_days=1';
   fetch(url)
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var temp = Math.round(data.current.temperature_2m);
       var code = data.current.weathercode;
+      var wind = Math.round(data.current.windspeed_10m);
+      var rainProb = data.daily && data.daily.precipitation_probability_max ? data.daily.precipitation_probability_max[0] : 0;
       var icon = weatherIcon(code);
+      var condLabel = weatherLabel(code);
+
+      // Update header chip
       var chip = el('weather-chip');
       if (chip) chip.textContent = icon + ' ' + temp + '°C';
+
+      // Update weather bar
+      var bar = el('weather-bar');
+      if (bar) bar.classList.add('show');
+
+      var tempPill = el('wb-temp-pill');
+      if (tempPill) tempPill.textContent = icon + ' ' + temp + '°C';
+
+      var condPill = el('wb-cond-pill');
+      if (condPill) condPill.textContent = condLabel;
+
+      var windPill = el('wb-wind-pill');
+      if (windPill) windPill.textContent = '💨 ' + wind + ' km/h';
+
+      var rainPill = el('wb-rain-pill');
+      if (rainPill) {
+        rainPill.textContent = '💧 ' + rainProb + '%';
+        rainPill.className = 'wb-rain-pill ' + (rainProb >= 70 ? 'wb-rain-high' : rainProb >= 40 ? 'wb-rain-med' : 'wb-rain-low');
+      }
     })
     .catch(function() {
       var chip = el('weather-chip');
       if (chip) chip.style.display = 'none';
     });
+}
+function weatherLabel(code) {
+  if (code === 0) return 'Despejado';
+  if (code <= 2) return 'Parcialmente nublado';
+  if (code <= 3) return 'Nublado';
+  if (code <= 49) return 'Niebla';
+  if (code <= 59) return 'Llovizna';
+  if (code <= 69) return 'Lluvia';
+  if (code <= 79) return 'Nieve';
+  if (code <= 84) return 'Lluvia intensa';
+  if (code <= 99) return 'Tormenta';
+  return 'Variable';
 }
 function weatherIcon(code) {
   if (code === 0) return '☀️';
@@ -990,6 +1631,7 @@ function enterApp(user) {
   updateUserChip();
   el('rv-name').value = user.name;
   fetchWeather();
+  setTimeout(renderRecent, 500);
   // Init filter button styles
   var fbikeBtn = el('f-bike'); if(fbikeBtn){fbikeBtn.style.borderColor='#2e7d32';fbikeBtn.style.color='#2e7d32';fbikeBtn.style.background='#e8f5e9';}
   var fscBtn = el('f-scooter'); if(fscBtn){fscBtn.style.borderColor='#0277bd';fscBtn.style.color='#0277bd';fscBtn.style.background='#e3f2fd';}
@@ -1276,6 +1918,11 @@ function initMap() {
   setTimeout(fixSize, 1500);
   window.addEventListener('resize', function() { setTimeout(fixSize, 150); });
   renderAll();
+  // Hide map skeleton
+  setTimeout(function() {
+    var sk = el('map-skeleton');
+    if (sk) { sk.style.opacity = '0'; setTimeout(function() { sk.style.display = 'none'; }, 500); }
+  }, 800);
 }
 
 var cyclewayLayer = null;
@@ -1457,6 +2104,17 @@ function updateCount() {
 function renderList() {
   var v = visibleParks();
   var html = '';
+  if (!mapReady && !v.length) {
+    // Skeleton loading
+    for (var sk = 0; sk < 5; sk++) {
+      html += '<div class="sk-card"><div style="display:flex;gap:10px;align-items:center;">'
+        + '<div class="sk-circle skeleton"></div>'
+        + '<div style="flex:1;"><div class="sk-line long skeleton"></div><div class="sk-line short skeleton"></div></div>'
+        + '</div></div>';
+    }
+    el('park-list').innerHTML = html;
+    return;
+  }
   for (var i = 0; i < v.length; i++) {
     var p = v[i];
     var open = isOpen(p.schedule);
@@ -1481,7 +2139,7 @@ function renderList() {
         + '</div>';
     }
 
-    html += '<div class="pcard' + sel + '" onclick="selectPark(' + p.id + ')">';
+    html += '<div class="pcard' + sel + '" onclick="selectPark(' + p.id + ')" style="animation-delay:' + (i * 0.04) + 's">';
     html += '<div class="pc-top"><div class="pc-name">' + p.name + '</div>';
     html += '<div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">';
     var isFav = isFavorite(p.id);
@@ -1527,6 +2185,7 @@ function selectPark(id) {
   selId = id; curId = id;
   var p = findPark(id);
   if (!p) return;
+  addRecent(id);
   renderAll();
   if (mapReady) leafMap.flyTo([p.lat, p.lng], 16, {duration: 0.7});
   showPopup(p);
@@ -1576,6 +2235,15 @@ function showDetail(p) {
   html += '<span class="pill ' + typeCls + '" style="font-size:.65rem;padding:3px 10px">' + typeLbl + '</span> ';
   html += '<span class="pill ' + (open ? 'p-open' : 'p-closed') + '" style="font-size:.65rem;padding:3px 10px">' + (open ? '● Abierto ahora' : '● Cerrado ahora') + '</span>';
   html += '</div>';
+
+  // Photos
+  if (p.photos && p.photos.length) {
+    html += '<div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px;scrollbar-width:none;">';
+    for (var pi = 0; pi < p.photos.length; pi++) {
+      html += '<img src="' + p.photos[pi] + '" style="height:120px;border-radius:10px;object-fit:cover;flex-shrink:0;cursor:pointer;" onclick="openPhotoViewer(\'' + pi + '\',' + p.id + ')">';
+    }
+    html += '</div>';
+  }
 
   // Address
   html += '<div class="det-addr">📍 ' + p.addr + '</div>';
@@ -1642,6 +2310,10 @@ function showDetail(p) {
   html += '<button class="btn-rev" onclick="openRev(' + p.id + ')">＋ Escribir una opinión</button>';
   var fav = isFavorite(p.id);
   html += '<button class="det-fav-btn' + (fav ? ' on' : '') + '" onclick="toggleFav(' + p.id + ');showDetail(findPark(' + p.id + '))">' + (fav ? '⭐ En tus favoritos' : '☆ Agregar a favoritos') + '</button>';
+  html += '<div style="display:flex;gap:8px;margin-top:10px;">';
+  html += '<button style="flex:1;padding:11px;background:none;border:1.5px solid #25D366;color:#25D366;border-radius:12px;cursor:pointer;font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;" onclick="shareWhatsApp(' + p.id + ')">📲 Compartir</button>';
+  html += '<button style="flex:1;padding:11px;background:none;border:1.5px solid #f59e0b;color:#f59e0b;border-radius:12px;cursor:pointer;font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;" onclick="openReport(' + p.id + ')">⚠️ Reportar</button>';
+  html += '</div>';
   html += '<button class="btn-dir" onclick="window.open(\'https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng + '&travelmode=bicycling\',\'_blank\')">🗺️ Cómo llegar</button>';
   html += '<div style="height:20px"></div>';
 
@@ -1703,6 +2375,7 @@ function startAdd() {
   el('add-hint').style.display = 'none';
   el('n-name').value = ''; el('n-addr').value = ''; el('n-cost').value = ''; el('n-phone').value = ''; el('n-url').value = '';
   el('n-lat').value = ''; el('n-lng').value = '';
+  newParkPhotos = []; renderNewPhotoPreview();
   el('n-24h').checked = false; el('n-times').style.display = 'block'; el('n-covered').checked = false;
   var nDayLabels = el('n-days').querySelectorAll('.day-chk');
   for (var ndi = 0; ndi < nDayLabels.length; ndi++) {
@@ -1780,14 +2453,24 @@ function saveNew() {
   var lat = pendingLat !== null ? pendingLat : parseFloat(el('n-lat').value);
   var lng = pendingLng !== null ? pendingLng : parseFloat(el('n-lng').value);
   if (!name) { alert('Ingresá un nombre'); return; }
-  if (isNaN(lat) || isNaN(lng)) { alert('Tocá el mapa para elegir la ubicación'); return; }
+  if (isNaN(lat) || isNaN(lng)) { alert('Tocá el mapa o escribí la dirección para ubicar el parking'); return; }
   var covered = el('n-covered').checked;
-  var p = {id: nxtId++, name: name, addr: addr || 'Montevideo', type: type, lat: lat, lng: lng, cost: cost, schedule: sched, phone: phone, url: url, covered: covered, reviews: []};
+  var p = {id: nxtId++, name: name, addr: addr || 'Montevideo', type: type, lat: lat, lng: lng, cost: cost, schedule: sched, phone: phone, url: url, covered: covered, photos: newParkPhotos.slice(), reviews: []};
+  newParkPhotos = [];
+  renderNewPhotoPreview();
   parks.push(p);
-localStorage.setItem('parks', JSON.stringify(parks));
-  cancelAdd();
+  localStorage.setItem('parks', JSON.stringify(parks));
+  localStorage.setItem('nxtId', nxtId);
+  // Remove temp marker before canceling
+  if (tmpMkr && leafMap) { leafMap.removeLayer(tmpMkr); tmpMkr = null; }
+  addingMode = false; pendingLat = null; pendingLng = null; pendingPickFromBtn = false;
+  if (leafMap) leafMap.getContainer().style.cursor = '';
+  el('map-banner').className = '';
+  var pickBtn = el('btn-pickmap');
+  if (pickBtn) { pickBtn.textContent = '📍 Tocar el mapa para ubicar'; pickBtn.classList.remove('picked'); }
+  closeOv('ov-add');
   renderAll();
-  setTimeout(function() { selectPark(p.id); }, 300);
+  setTimeout(function() { selectPark(p.id); }, 400);
 }
 
 // ═══════════════════════════════════════════════════
@@ -1808,6 +2491,7 @@ function openEdit(id) {
   for (var ri = 0; ri < eRadios.length; ri++) {
     eRadios[ri].checked = (eRadios[ri].value === (p.covered ? 'yes' : 'no'));
   }
+  renderPhotoPreview(p.photos || []);
   if (p.schedule === '24h') {
     el('e-24h').checked = true; el('e-times').style.display = 'none';
     var lbl24 = el('e-24h-label'); if (lbl24) lbl24.classList.add('on');
@@ -1941,7 +2625,7 @@ function collapseSheet() {
 
 // Init
 window.addEventListener('DOMContentLoaded', function() {
-  // nothing — app starts on login
+  showOnboarding();
 });
 </script>
 </body>
