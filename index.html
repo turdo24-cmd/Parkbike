@@ -193,11 +193,13 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   .sb-handle { width:36px; height:4px; background:#e2e6ed; border-radius:2px; margin:0 auto 8px; }
   .btn-add { display:none; }
   #fab { display:none; position:absolute; bottom:165px; right:14px; z-index:200; width:50px; height:50px; border-radius:50%; background:#2e7d32; color:#fff; border:none; cursor:pointer; font-size:1.4rem; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(46,125,50,.4); }
+  #btn-locate { display:flex; position:absolute; bottom:105px; right:14px; z-index:200; width:44px; height:44px; border-radius:50%; background:#fff; color:#6366f1; border:2px solid #e0e7ff; cursor:pointer; font-size:1.2rem; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,.15); }
 }
 @media (min-width:700px) {
   .sb-handle { display:none; }
   #fab { display:none; }
   .btn-add { display:none; }
+  #btn-locate { display:none; }
 }
 
 /* BANNER on map */
@@ -404,6 +406,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
         <button class="ban-cancel" id="ban-cancel">✕ Cancelar</button>
       </div>
       <button id="fab" onclick="startAdd()">＋</button>
+      <button id="btn-locate" onclick="locateMe()" title="Mi ubicación">📍</button>
     </div>
     <div class="sidebar" id="sidebar">
       <div class="sb-handle"></div>
@@ -871,6 +874,34 @@ function switchTab(tab) {
   el('tab-login').style.display = tab === 'login' ? 'block' : 'none';
   el('tab-reg').style.display = tab === 'register' ? 'block' : 'none';
 }
+var userLocationMarker = null;
+function locateMe() {
+  var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (!isMobile) return;
+  if (!navigator.geolocation) { alert('Tu dispositivo no soporta geolocalización.'); return; }
+  var btn = el('btn-locate');
+  if (btn) btn.textContent = '⏳';
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    var lat = pos.coords.latitude;
+    var lng = pos.coords.longitude;
+    if (btn) btn.textContent = '📍';
+    placeUserMarker(lat, lng);
+    leafMap.flyTo([lat, lng], 15, { duration: 1 });
+  }, function(err) {
+    if (btn) btn.textContent = '📍';
+    alert('No se pudo obtener tu ubicación. Verificá los permisos en Ajustes → Safari → Ubicación.');
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+}
+function placeUserMarker(lat, lng) {
+  if (userLocationMarker && leafMap) leafMap.removeLayer(userLocationMarker);
+  var dot = '<div style="width:18px;height:18px;background:#6366f1;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px rgba(99,102,241,.3),0 2px 8px rgba(0,0,0,.2);"></div>';
+  userLocationMarker = L.marker([lat, lng], {
+    icon: L.divIcon({ className:'', html: dot, iconSize:[18,18], iconAnchor:[9,9] }),
+    zIndexOffset: 1000,
+    draggable: false
+  }).addTo(leafMap).bindPopup('<div style="font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;padding:4px 2px;">📍 Tu ubicación</div>');
+}
+
 // ── WEATHER ──
 function fetchWeather() {
   var url = 'https://api.open-meteo.com/v1/forecast?latitude=-34.9058&longitude=-56.1650&current=temperature_2m,weathercode,windspeed_10m&timezone=America/Montevideo';
