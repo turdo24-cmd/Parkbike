@@ -71,7 +71,8 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .hdr-name { font-family:'Sora',sans-serif; font-weight:700; font-size:.92rem; }
 .hdr-name span { color:#6366f1; }
 .hdr-right { display:flex; align-items:center; gap:6px; }
-.user-chip { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:100px; background:#e8f5e9; border:1px solid #a5d6a7; }
+.weather-chip { display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:100px; background:#f0f4ff; border:1px solid #e0e7ff; font-size:.78rem; font-weight:600; color:#4338ca; font-family:'Inter',sans-serif; white-space:nowrap; }
+.user-chip { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:100px; background:#f0f4ff; border:1px solid #e0e7ff; }
 .user-av { width:28px; height:28px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; color:#fff; font-weight:700; overflow:hidden; flex-shrink:0; min-width:28px; }
 .user-av img { width:28px; height:28px; object-fit:cover; border-radius:50%; display:block; }
 .user-nm { font-size:.75rem; font-weight:600; color:#2e7d32; max-width:72px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -250,6 +251,12 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .prof-tab { flex:1; padding:8px 14px; border-radius:8px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#94a3b8; font-family:'Inter',sans-serif; font-size:.82rem; font-weight:600; cursor:pointer; }
 .prof-tab.on { background:#6366f1; color:#fff; border-color:#6366f1; }
 
+/* VEHICLE OPTIONS */
+.veh-opt { display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:12px; border:1.5px solid #e2e8f0; background:#f8fafc; cursor:pointer; font-size:.88rem; font-weight:500; color:#374151; transition:all .2s; user-select:none; -webkit-user-select:none; }
+.veh-opt.on { border-color:#6366f1; background:#eef2ff; color:#4338ca; font-weight:600; }
+.veh-dot { width:18px; height:18px; border-radius:50%; border:2px solid; flex-shrink:0; transition:all .2s; }
+.veh-opt.on .veh-dot { background:#6366f1 !important; border-color:#6366f1 !important; box-shadow:0 0 0 3px rgba(99,102,241,.2); }
+
 /* AVATAR */
 .avatar-upload-wrap { display:flex; align-items:center; gap:14px; margin-bottom:16px; padding:14px; background:#f8fafc; border-radius:14px; border:1.5px dashed #e2e8f0; }
 .avatar-preview { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#fff; font-weight:700; overflow:hidden; flex-shrink:0; border:3px solid #fff; box-shadow:0 2px 8px rgba(99,102,241,.3); }
@@ -277,17 +284,17 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 <div id="auth">
   <div class="a-wrap">
     <div class="a-logo">
-      <div class="a-icon"><svg width="62" height="62" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="12" cy="36" r="9" stroke="rgba(255,255,255,0.95)" stroke-width="3" fill="none"/>
-  <circle cx="40" cy="36" r="9" stroke="rgba(255,255,255,0.95)" stroke-width="3" fill="none"/>
-  <circle cx="12" cy="36" r="2.5" fill="white"/>
-  <circle cx="40" cy="36" r="2.5" fill="white"/>
-  <path d="M12 36 L22 19 L40 36" stroke="#fde68a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M22 19 L31 36" stroke="#fde68a" stroke-width="3" stroke-linecap="round" fill="none"/>
-  <path d="M27 19 L40 19 L40 36" stroke="#fbcfe8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M19 19 L25 19" stroke="white" stroke-width="3" stroke-linecap="round"/>
-  <path d="M37 19 L43 19" stroke="white" stroke-width="3" stroke-linecap="round"/>
-  <line x1="40" y1="16.5" x2="40" y2="20" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      <div class="a-icon"><svg width="70" height="70" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="12" cy="36" r="9" stroke="rgba(255,255,255,1)" stroke-width="3.5" fill="none"/>
+  <circle cx="40" cy="36" r="9" stroke="rgba(255,255,255,1)" stroke-width="3.5" fill="none"/>
+  <circle cx="12" cy="36" r="3" fill="white"/>
+  <circle cx="40" cy="36" r="3" fill="white"/>
+  <path d="M12 36 L22 19 L40 36" stroke="#fef08a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M22 19 L31 36" stroke="#fef08a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M27 19 L40 19 L40 36" stroke="#fda4af" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M18 19 L26 19" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M36 19 L44 19" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="40" y1="15" x2="40" y2="20" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
 </svg></div>
       <div class="a-title">Park<span>Bike</span></div>
       <div class="a-sub">Parkings para bicicletas y monopatines</div>
@@ -316,15 +323,21 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
         <div class="a-field"><label>Fecha de nacimiento</label><input type="date" id="r-dob" style="width:100%"></div>
         <div class="a-field">
           <label>¿Qué vehículo usás?</label>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;">
-            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;">
-              <input type="checkbox" id="r-bike" style="width:16px;height:16px;accent-color:#2e7d32;"> 🚲 Bicicleta
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+            <label class="veh-opt" id="r-bike-lbl" onclick="toggleVeh('r-bike', this)">
+              <input type="checkbox" id="r-bike" style="display:none">
+              <span class="veh-dot" style="background:#e8f5e9;border-color:#a5d6a7;"></span>
+              <span>🚲 Bicicleta</span>
             </label>
-            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;">
-              <input type="checkbox" id="r-ebike" style="width:16px;height:16px;accent-color:#2e7d32;"> ⚡ Bicicleta eléctrica
+            <label class="veh-opt" id="r-ebike-lbl" onclick="toggleVeh('r-ebike', this)">
+              <input type="checkbox" id="r-ebike" style="display:none">
+              <span class="veh-dot" style="background:#ede9fe;border-color:#c4b5fd;"></span>
+              <span>⚡ Bicicleta eléctrica</span>
             </label>
-            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;">
-              <input type="checkbox" id="r-scooter" style="width:16px;height:16px;accent-color:#0277bd;"> 🛴 Monopatín
+            <label class="veh-opt" id="r-scooter-lbl" onclick="toggleVeh('r-scooter', this)">
+              <input type="checkbox" id="r-scooter" style="display:none">
+              <span class="veh-dot" style="background:#e0f2fe;border-color:#7dd3fc;"></span>
+              <span>🛴 Monopatín</span>
             </label>
           </div>
         </div>
@@ -345,6 +358,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
       <div class="hdr-name">Park<span>Bike</span></div>
     </div>
     <div class="hdr-right">
+      <div class="weather-chip" id="weather-chip">🌤 --°C</div>
       <div class="user-chip" onclick="openProfile()" style="cursor:pointer;" title="Mi perfil">
         <div class="user-av" id="user-av">?</div>
         <div class="user-nm" id="user-nm">Usuario</div>
@@ -439,15 +453,21 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
       <div class="fg"><label>Fecha de nacimiento</label><input type="date" id="p-dob" style="width:100%"></div>
       <div class="fg">
         <label>¿Qué vehículo usás?</label>
-        <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
-          <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;padding:9px 12px;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;">
-            <input type="checkbox" id="p-bike" style="width:16px;height:16px;accent-color:#6366f1;"> 🚲 Bicicleta
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+          <label class="veh-opt" id="p-bike-lbl" onclick="toggleVeh('p-bike', this)">
+            <input type="checkbox" id="p-bike" style="display:none">
+            <span class="veh-dot" style="background:#e8f5e9;border-color:#a5d6a7;"></span>
+            <span>🚲 Bicicleta</span>
           </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;padding:9px 12px;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;">
-            <input type="checkbox" id="p-ebike" style="width:16px;height:16px;accent-color:#6366f1;"> ⚡ Bicicleta eléctrica
+          <label class="veh-opt" id="p-ebike-lbl" onclick="toggleVeh('p-ebike', this)">
+            <input type="checkbox" id="p-ebike" style="display:none">
+            <span class="veh-dot" style="background:#ede9fe;border-color:#c4b5fd;"></span>
+            <span>⚡ Bicicleta eléctrica</span>
           </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;padding:9px 12px;border-radius:10px;border:1.5px solid #e2e8f0;background:#f8fafc;">
-            <input type="checkbox" id="p-scooter" style="width:16px;height:16px;accent-color:#0277bd;"> 🛴 Monopatín
+          <label class="veh-opt" id="p-scooter-lbl" onclick="toggleVeh('p-scooter', this)">
+            <input type="checkbox" id="p-scooter" style="display:none">
+            <span class="veh-dot" style="background:#e0f2fe;border-color:#7dd3fc;"></span>
+            <span>🛴 Monopatín</span>
           </label>
         </div>
       </div>
@@ -849,6 +869,41 @@ function switchTab(tab) {
   el('tab-login').style.display = tab === 'login' ? 'block' : 'none';
   el('tab-reg').style.display = tab === 'register' ? 'block' : 'none';
 }
+// ── WEATHER ──
+function fetchWeather() {
+  var url = 'https://api.open-meteo.com/v1/forecast?latitude=-34.9058&longitude=-56.1650&current=temperature_2m,weathercode,windspeed_10m&timezone=America/Montevideo';
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var temp = Math.round(data.current.temperature_2m);
+      var code = data.current.weathercode;
+      var icon = weatherIcon(code);
+      var chip = el('weather-chip');
+      if (chip) chip.textContent = icon + ' ' + temp + '°C';
+    })
+    .catch(function() {
+      var chip = el('weather-chip');
+      if (chip) chip.style.display = 'none';
+    });
+}
+function weatherIcon(code) {
+  if (code === 0) return '☀️';
+  if (code <= 2) return '⛅';
+  if (code <= 3) return '☁️';
+  if (code <= 49) return '🌫️';
+  if (code <= 59) return '🌦️';
+  if (code <= 69) return '🌧️';
+  if (code <= 79) return '🌨️';
+  if (code <= 84) return '🌧️';
+  if (code <= 99) return '⛈️';
+  return '🌤️';
+}
+
+function toggleVeh(id, lbl) {
+  var cb = el(id);
+  cb.checked = !cb.checked;
+  lbl.classList.toggle('on', cb.checked);
+}
 function fillDemo() {
   el('l-email').value = 'demo@parkbike.uy';
   el('l-pwd').value = 'demo123';
@@ -901,7 +956,7 @@ function enterApp(user) {
   el('app').style.display = 'flex';
   updateUserChip();
   el('rv-name').value = user.name;
-
+  fetchWeather();
   setTimeout(initMap, 300);
 }
 
@@ -977,6 +1032,9 @@ function openProfile() {
   el('p-bike').checked = v.indexOf('bike') > -1;
   el('p-ebike').checked = v.indexOf('ebike') > -1;
   el('p-scooter').checked = v.indexOf('scooter') > -1;
+  var plbl = el('p-bike-lbl'); if (plbl) plbl.classList.toggle('on', v.indexOf('bike') > -1);
+  var elbl = el('p-ebike-lbl'); if (elbl) elbl.classList.toggle('on', v.indexOf('ebike') > -1);
+  var slbl = el('p-scooter-lbl'); if (slbl) slbl.classList.toggle('on', v.indexOf('scooter') > -1);
   // Avatar preview
   var prev = el('prof-av-preview');
   if (currentUser.avatar) {
