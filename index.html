@@ -117,7 +117,10 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 @media (max-width:699px) {
   .wb-row { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
   .wb-pill { display:flex; align-items:center; justify-content:center; gap:3px; padding:5px 4px; border-radius:10px; background:#fff; border:1px solid #e0e7ff; color:#4338ca; font-weight:600; font-size:.68rem; text-align:center; }
-  .wb-rain-pill { display:flex; align-items:center; justify-content:center; gap:3px; padding:5px 4px; border-radius:10px; font-weight:700; font-size:.68rem; border:1px solid; }
+  .wb-rain-pill { display:flex; align-items:center; justify-content:center; gap:3px; padding:5px 4px; border-radius:10px; font-weight:600; font-size:.68rem; border:1px solid #e0e7ff; background:#fff; color:#4338ca; }
+  .wb-rain-low { background:#fff; border-color:#e0e7ff; color:#4338ca; }
+  .wb-rain-med { background:#fefce8; border-color:#fde047; color:#b45309; }
+  .wb-rain-high { background:#fef2f2; border-color:#fecaca; color:#dc2626; }
 }
 
 /* Desktop: pills en línea con separadores */
@@ -505,7 +508,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   <div class="search-bar">
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="Buscar parking por nombre o barrio…" oninput="onSearch(this.value)" onfocus="showSuggestions()" onblur="hideSuggestions()" autocomplete="off" autocorrect="off" autocapitalize="none">
+      <input type="text" id="search-input" placeholder="Buscar parking por nombre o barrio…" oninput="onSearch(this.value);showSuggestions()" onfocus="showSuggestions()" onblur="hideSuggestions()" autocomplete="off" autocorrect="off" autocapitalize="none">
       <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
     </div>
     <div id="search-suggestions" style="display:none;position:absolute;left:12px;right:12px;top:100%;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:500;max-height:260px;overflow-y:auto;border:1px solid #e2e8f0;"></div>
@@ -1131,16 +1134,23 @@ function searchAddr(prefix) {
   if (val.length < 3) { sug.style.display = 'none'; return; }
   clearTimeout(addrTimeout[prefix]);
   addrTimeout[prefix] = setTimeout(function() {
-    var q = val + ', Montevideo, Uruguay';
-    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&q=' + encodeURIComponent(q))
+    var q = encodeURIComponent(val + ' Montevideo Uruguay');
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=uy&q=' + q + '&addressdetails=1', {
+      headers: { 'Accept-Language': 'es', 'User-Agent': 'ParkBike/1.0' }
+    })
       .then(function(r) { return r.json(); })
       .then(function(results) {
-        if (!results.length) { sug.style.display = 'none'; return; }
+        if (!results || !results.length) { sug.style.display = 'none'; return; }
         sug.innerHTML = results.map(function(r) {
-          var display = r.display_name.replace(', Uruguay', '').replace(', Montevideo', '');
+          var addr = r.address || {};
+          var parts = [];
+          if (addr.road) parts.push(addr.road);
+          if (addr.house_number) parts[0] = (parts[0] || '') + ' ' + addr.house_number;
+          if (addr.suburb || addr.neighbourhood) parts.push(addr.suburb || addr.neighbourhood);
+          var display = parts.length ? parts.join(', ') : r.display_name.split(',').slice(0,2).join(',');
           return '<div style="padding:10px 14px;cursor:pointer;font-size:.82rem;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;color:#1a1f2e;" '
-            + 'onmousedown="pickAddr(\'' + prefix + '\',' + r.lat + ',' + r.lon + ',\'' + display.replace(/'/g, '') + '\')">'
-            + '📍 ' + display + '</div>';
+            + 'onmousedown="pickAddr(\'' + prefix + '\',' + r.lat + ',' + r.lon + ',\'' + display.trim().replace(/'/g, '') + '\')">'
+            + '📍 ' + display.trim() + '</div>';
         }).join('');
         sug.style.display = 'block';
       })
@@ -1441,52 +1451,100 @@ function resetNearestBtn() {
 var suggestionsTimeout = null;
 function showSuggestions() {
   var val = el('search-input').value.trim();
+  var sug = el('search-suggestions');
+
   if (val.length < 1) {
-    // Show recent searches + top barrios
     var html = '<div style="padding:6px 14px 4px;font-size:.62rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">Barrios</div>';
-    var barrios = ['Centro', 'Ciudad Vieja', 'Pocitos', 'Punta Carretas', 'Malvín', 'Buceo', 'Parque Rodó', 'Tres Cruces', 'Aguada', 'Cordón', 'Carrasco', 'La Teja'];
+    var barrios = ['Centro','Ciudad Vieja','Pocitos','Punta Carretas','Malvín','Buceo','Parque Rodó','Tres Cruces','Aguada','Cordón','Carrasco','La Teja'];
     html += barrios.map(function(b) {
       return '<div style="padding:9px 14px;cursor:pointer;font-size:.84rem;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;color:#374151;" onmousedown="pickSuggestion(\'\',\'' + b + '\')">🏘️ ' + b + '</div>';
     }).join('');
-    var sug = el('search-suggestions');
-    sug.innerHTML = html;
-    sug.style.display = 'block';
-    return;
+    sug.innerHTML = html; sug.style.display = 'block'; return;
   }
-  var ql = val.toLowerCase();
-  var results = [];
-  // Search parks by name and address
-  for (var i = 0; i < parks.length; i++) {
-    var p = parks[i];
-    if (p.name.toLowerCase().indexOf(ql) > -1 || p.addr.toLowerCase().indexOf(ql) > -1) {
-      var open = isOpen(p.schedule);
-      results.push({ type: 'park', label: p.name, sub: p.addr, id: p.id, open: open });
-      if (results.length >= 5) break;
+
+  clearTimeout(suggestionsTimeout);
+  suggestionsTimeout = setTimeout(function() {
+    var ql = val.toLowerCase();
+    var parkResults = [];
+    for (var i = 0; i < parks.length; i++) {
+      var p = parks[i];
+      if (p.name.toLowerCase().indexOf(ql) > -1 || p.addr.toLowerCase().indexOf(ql) > -1) {
+        var open = isOpen(p.schedule);
+        parkResults.push({ type:'park', label:p.name, sub:p.addr, id:p.id, open:open });
+        if (parkResults.length >= 4) break;
+      }
     }
-  }
-  // Also search barrios
-  var barrios2 = ['Centro', 'Ciudad Vieja', 'Pocitos', 'Punta Carretas', 'Malvín', 'Buceo', 'Parque Rodó', 'Tres Cruces', 'Aguada', 'Cordón', 'Carrasco', 'La Teja'];
-  var barResults = barrios2.filter(function(b) { return b.toLowerCase().indexOf(ql) > -1; });
+    var barrios2 = ['Centro','Ciudad Vieja','Pocitos','Punta Carretas','Malvín','Buceo','Parque Rodó','Tres Cruces','Aguada','Cordón','Carrasco','La Teja'];
+    var barrioResults = barrios2.filter(function(b) { return b.toLowerCase().indexOf(ql) > -1; });
+    var html = '';
+    if (parkResults.length) {
+      html += '<div style="padding:6px 14px 4px;font-size:.62rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">Parkings</div>';
+      html += parkResults.map(function(r) {
+        return '<div style="padding:9px 14px;cursor:pointer;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;" onmousedown="pickSuggestion(\'' + r.id + '\',\'\')">'
+          + '<div style="font-size:.84rem;font-weight:600;color:#1a1f2e;">' + r.label + '</div>'
+          + '<div style="font-size:.72rem;color:#94a3b8;margin-top:1px;">' + r.sub + ' · <span style="color:' + (r.open ? '#2e7d32':'#c62828') + '">' + (r.open ? '● Abierto':'● Cerrado') + '</span></div>'
+          + '</div>';
+      }).join('');
+    }
+    if (barrioResults.length) {
+      html += '<div style="padding:6px 14px 4px;font-size:.62rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">Barrios</div>';
+      html += barrioResults.map(function(b) {
+        return '<div style="padding:9px 14px;cursor:pointer;font-size:.84rem;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;color:#374151;" onmousedown="pickSuggestion(\'\',\'' + b + '\')">🏘️ ' + b + '</div>';
+      }).join('');
+    }
+    // Also search address via Nominatim
+    html += '<div id="sug-addr-results"></div>';
+    sug.innerHTML = html;
+    sug.style.display = html ? 'block' : 'none';
+
+    // Fetch address results async
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=3&countrycodes=uy&q=' + encodeURIComponent(val + ' Montevideo') + '&addressdetails=1')
+      .then(function(r) { return r.json(); })
+      .then(function(results) {
+        var addrDiv = el('sug-addr-results');
+        if (!addrDiv || !results || !results.length) return;
+        var addrHtml = '<div style="padding:6px 14px 4px;font-size:.62rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">Direcciones</div>';
+        addrHtml += results.map(function(r) {
+          var addr = r.address || {};
+          var parts = [];
+          if (addr.road) parts.push(addr.road + (addr.house_number ? ' ' + addr.house_number : ''));
+          if (addr.suburb || addr.neighbourhood) parts.push(addr.suburb || addr.neighbourhood);
+          var display = parts.length ? parts.join(', ') : r.display_name.split(',').slice(0,2).join(',').trim();
+          return '<div style="padding:9px 14px;cursor:pointer;font-size:.84rem;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;color:#374151;" '
+            + 'onmousedown="goToAddress(' + r.lat + ',' + r.lon + ',\'' + display.replace(/'/g,'') + '\')">📍 ' + display + '</div>';
+        }).join('');
+        addrDiv.innerHTML = addrHtml;
+        sug.style.display = 'block';
+      }).catch(function() {});
+  }, 350);
+}
+
+function goToAddress(lat, lng, label) {
   var sug = el('search-suggestions');
-  if (!results.length && !barResults.length) { sug.style.display = 'none'; return; }
-  var html = '';
-  if (results.length) {
-    html += '<div style="padding:6px 14px 4px;font-size:.62rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">Parkings</div>';
-    html += results.map(function(r) {
-      return '<div style="padding:9px 14px;cursor:pointer;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;" onmousedown="pickSuggestion(\'' + r.id + '\',\'\')">'
-        + '<div style="font-size:.84rem;font-weight:600;color:#1a1f2e;">' + r.label + '</div>'
-        + '<div style="font-size:.72rem;color:#94a3b8;margin-top:1px;">' + r.sub + ' · <span style="color:' + (r.open ? '#2e7d32' : '#c62828') + '">' + (r.open ? '● Abierto' : '● Cerrado') + '</span></div>'
-        + '</div>';
-    }).join('');
-  }
-  if (barResults.length) {
-    html += '<div style="padding:6px 14px 4px;font-size:.62rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">Barrios</div>';
-    html += barResults.map(function(b) {
-      return '<div style="padding:9px 14px;cursor:pointer;font-size:.84rem;border-bottom:1px solid #f1f5f9;font-family:Inter,sans-serif;color:#374151;" onmousedown="pickSuggestion(\'\',\'' + b + '\')">🏘️ ' + b + '</div>';
-    }).join('');
-  }
-  sug.innerHTML = html;
-  sug.style.display = 'block';
+  if (sug) sug.style.display = 'none';
+  // Clear search so all parks show on map
+  searchQuery = '';
+  el('search-input').value = label;
+  el('search-clear').classList.add('show');
+  if (!mapReady) return;
+  leafMap.flyTo([lat, lng], 16, { duration: 1 });
+  // Show marker at searched address
+  if (window._addrMarker) leafMap.removeLayer(window._addrMarker);
+  var dot = '<div style="width:14px;height:14px;background:#ef4444;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(239,68,68,.5);"></div>';
+  window._addrMarker = L.marker([lat, lng], {
+    icon: L.divIcon({ className:'', html:dot, iconSize:[14,14], iconAnchor:[7,7] }),
+    zIndexOffset: 999
+  }).addTo(leafMap).bindPopup('<div style="font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;padding:4px 2px;">📍 ' + label + '</div>').openPopup();
+  // Render all parks on map then select nearest
+  renderAll();
+  setTimeout(function() {
+    var sorted = parks.slice().sort(function(a, b) {
+      var da = Math.pow(a.lat - lat, 2) + Math.pow(a.lng - lng, 2);
+      var db = Math.pow(b.lat - lat, 2) + Math.pow(b.lng - lng, 2);
+      return da - db;
+    });
+    if (sorted.length) selectPark(sorted[0].id);
+  }, 900);
 }
 function hideSuggestions() {
   setTimeout(function() {
@@ -1917,7 +1975,7 @@ function initMap() {
   if (mapReady) return;
   mapReady = true;
   leafMap = L.map('map', {center: [-34.9058, -56.165], zoom: 13, zoomControl: false});
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19
   }).addTo(leafMap);
   L.control.zoom({position: 'bottomright'}).addTo(leafMap);
@@ -2318,30 +2376,45 @@ function showDetail(p) {
   if (p.phone || p.url) {
     html += '<div class="contact-block">';
     html += '<div class="contact-lbl">📬 Contacto</div>';
+    html += '<div style="display:flex;gap:8px;">';
     if (p.phone) {
-      html += '<a href="tel:' + p.phone + '" class="contact-link contact-link-phone">';
-      html += '<span class="contact-icon">📞</span>';
-      html += '<div><div class="contact-info-lbl">Teléfono</div><div class="contact-info-val">' + p.phone + '</div></div>';
+      html += '<a href="tel:' + p.phone + '" style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;text-decoration:none;background:#e8f5e9;border:1.5px solid #a5d6a7;color:#1b5e20;">';
+      html += '<span style="font-size:1rem;flex-shrink:0;">📞</span>';
+      html += '<div><div style="font-size:.58rem;font-family:Space Mono,monospace;text-transform:uppercase;opacity:.7;margin-bottom:1px;">Teléfono</div><div style="font-size:.82rem;font-weight:600;">' + p.phone + '</div></div>';
       html += '</a>';
     }
     if (p.url) {
-      html += '<a href="' + p.url + '" target="_blank" rel="noopener" class="contact-link contact-link-web">';
-      html += '<span class="contact-icon">' + urlIcon(p.url) + '</span>';
-      html += '<div><div class="contact-info-lbl">' + urlLabel(p.url) + '</div><div class="contact-info-val">' + urlShort(p.url) + '</div></div>';
+      html += '<a href="' + p.url + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;text-decoration:none;background:#fce4ec;border:1.5px solid #f48fb1;color:#880e4f;">';
+      html += '<span style="font-size:1rem;flex-shrink:0;">' + urlIcon(p.url) + '</span>';
+      html += '<div><div style="font-size:.58rem;font-family:Space Mono,monospace;text-transform:uppercase;opacity:.7;margin-bottom:1px;">' + urlLabel(p.url) + '</div><div style="font-size:.78rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px;">' + urlShort(p.url) + '</div></div>';
       html += '</a>';
     }
-    html += '</div>';
+    html += '</div></div>';
   }
 
-  // Schedule
-  html += '<div class="sec-title">🕐 Horario semanal</div>';
-  html += '<div class="h-list">';
-  for (var i = 0; i < DAYS.length; i++) {
-    var todayCls = i === TODAY ? ' today' : '';
-    var todayMark = i === TODAY ? ' <b style="color:#2e7d32">(hoy)</b>' : '';
-    html += '<div class="h-row' + todayCls + '"><span class="h-day">' + DAYS[i] + todayMark + '</span><span class="h-hour">' + hlbl(p.schedule) + '</span></div>';
+  // Schedule - compact format
+  html += '<div class="sec-title">🕐 Horario</div>';
+  if (p.schedule === '24h') {
+    html += '<div style="padding:10px 14px;background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:12px;font-size:.85rem;font-weight:600;color:#2e7d32;">⏰ Abierto 24 horas · todos los días</div>';
+  } else {
+    var pipeIdx = p.schedule.indexOf('|');
+    var timePart = pipeIdx > -1 ? p.schedule.substring(0, pipeIdx) : p.schedule;
+    var closedDays = pipeIdx > -1 ? p.schedule.substring(pipeIdx + 1).split(',').map(Number) : [];
+    var tparts = timePart.split('-');
+    var openT = tparts[0] || '08:00';
+    var closeT = tparts[1] || '22:00';
+    var DAY_INIT = ['D','L','Ma','Mi','J','V','S'];
+    html += '<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">';
+    for (var di = 0; di < 7; di++) {
+      var isClosed = closedDays.indexOf(di) > -1;
+      var isToday = di === TODAY;
+      html += '<div style="padding:5px 8px;border-radius:8px;font-size:.75rem;font-weight:700;font-family:Inter,sans-serif;'
+        + (isToday ? 'background:#6366f1;color:#fff;' : isClosed ? 'background:#ffebee;color:#c62828;text-decoration:line-through;' : 'background:#f0f4ff;color:#4338ca;')
+        + '">' + DAY_INIT[di] + '</div>';
+    }
+    html += '</div>';
+    html += '<div style="font-size:.82rem;color:#374151;font-weight:500;">🕐 ' + openT + ' – ' + closeT + (closedDays.length ? ' <span style="color:#c62828;font-size:.75rem;">(cierra ' + closedDays.map(function(d){return DAY_INIT[d];}).join(', ') + ')</span>' : '') + '</div>';
   }
-  html += '</div>';
 
   // Reviews
   html += '<div class="sec-title">💬 Opiniones (' + p.reviews.length + ')</div>';
