@@ -18,7 +18,10 @@
 <title>ParkBike</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter',sans-serif; overflow:hidden; }
@@ -123,7 +126,10 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   .wb-row { display:flex; align-items:center; gap:8px; }
   .wb-sep { display:block; width:1px; height:14px; background:#e0e7ff; flex-shrink:0; }
   .wb-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; background:#fff; border:1px solid #e0e7ff; color:#4338ca; font-weight:600; white-space:nowrap; font-size:.75rem; }
-  .wb-rain-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; font-weight:700; font-size:.75rem; white-space:nowrap; border:1px solid; }
+  .wb-rain-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; font-weight:600; font-size:.75rem; white-space:nowrap; border:1px solid #e0e7ff; background:#fff; color:#4338ca; }
+  .wb-rain-low { background:#fff; border-color:#e0e7ff; color:#4338ca; }
+  .wb-rain-med { background:#fefce8; border-color:#fde047; color:#b45309; }
+  .wb-rain-high { background:#fef2f2; border-color:#fecaca; color:#dc2626; }
 }
 .user-chip { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:100px; background:#f0f4ff; border:1px solid #e0e7ff; }
 .user-av { width:28px; height:28px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; color:#fff; font-weight:700; overflow:hidden; flex-shrink:0; min-width:28px; }
@@ -329,10 +335,22 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .avatar-upload-info span { font-size:.72rem; color:#94a3b8; }
 .btn-upload-av { display:inline-block; margin-top:7px; padding:7px 14px; border-radius:8px; border:1.5px solid #6366f1; background:#fff; color:#6366f1; font-family:'Inter',sans-serif; font-size:.78rem; font-weight:600; cursor:pointer; white-space:nowrap; }
 
+/* MARKER CLUSTER */
+.marker-cluster { background:rgba(99,102,241,.2); border-radius:50%; }
+.marker-cluster div { background:rgba(99,102,241,.85); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Inter',sans-serif; font-weight:700; font-size:.78rem; box-shadow:0 2px 8px rgba(99,102,241,.4); }
+.marker-cluster-small { width:36px; height:36px; }
+.marker-cluster-small div { width:28px; height:28px; margin:4px; }
+.marker-cluster-medium { width:44px; height:44px; }
+.marker-cluster-medium div { width:34px; height:34px; margin:5px; }
+.marker-cluster-large { width:52px; height:52px; }
+.marker-cluster-large div { width:40px; height:40px; margin:6px; }
+
 /* Leaflet popup */
 .leaflet-popup-content-wrapper { background:#fff !important; border:1px solid #e2e6ed !important; border-radius:14px !important; color:#1a1f2e !important; font-family:'Inter',sans-serif !important; box-shadow:0 8px 32px rgba(0,0,0,.15) !important; }
 .leaflet-popup-tip { background:#fff !important; }
 .leaflet-popup-content { margin:0 !important; }
+.marker-cluster-small, .marker-cluster-medium, .marker-cluster-large { background:none !important; }
+.marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div { background:none !important; }
 .pop-inner { padding:13px 15px; min-width:200px; }
 .pop-type { font-size:.62rem; font-family:'Sora',sans-serif; font-weight:700; margin-bottom:3px; }
 .pop-name { font-size:.9rem; font-weight:700; margin-bottom:2px; }
@@ -1899,7 +1917,7 @@ function initMap() {
   if (mapReady) return;
   mapReady = true;
   leafMap = L.map('map', {center: [-34.9058, -56.165], zoom: 13, zoomControl: false});
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19
   }).addTo(leafMap);
   L.control.zoom({position: 'bottomright'}).addTo(leafMap);
@@ -2178,19 +2196,39 @@ function renderList() {
     el('park-list').innerHTML = html;
   }
 }
+var clusterGroup = null;
 function renderMarkers() {
   if (!mapReady) return;
-  for (var k in mkrs) { leafMap.removeLayer(mkrs[k]); }
+  // Remove old cluster group
+  if (clusterGroup) { leafMap.removeLayer(clusterGroup); }
+  for (var k in mkrs) { mkrs[k] = null; }
   mkrs = {};
+
+  clusterGroup = L.markerClusterGroup({
+    maxClusterRadius: 50,
+    showCoverageOnHover: false,
+    iconCreateFunction: function(cluster) {
+      var count = cluster.getChildCount();
+      return L.divIcon({
+        className: '',
+        html: '<div style="width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-family:Inter,sans-serif;font-weight:700;font-size:.8rem;box-shadow:0 2px 10px rgba(99,102,241,.4);">' + count + '</div>',
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+      });
+    }
+  });
+
   var v = visibleParks();
   for (var i = 0; i < v.length; i++) {
     (function(p) {
       var open = isOpen(p.schedule);
-      var m = L.marker([p.lat, p.lng], {icon: mkIcon(p.type, selId === p.id, open)}).addTo(leafMap);
+      var m = L.marker([p.lat, p.lng], {icon: mkIcon(p.type, selId === p.id, open)});
       m.on('click', function() { selectPark(p.id); });
       mkrs[p.id] = m;
+      clusterGroup.addLayer(m);
     })(v[i]);
   }
+  leafMap.addLayer(clusterGroup);
 }
 
 // ═══════════════════════════════════════════════════
