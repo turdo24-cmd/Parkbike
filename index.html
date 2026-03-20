@@ -771,7 +771,7 @@ var parks = JSON.parse(localStorage.getItem('parks')) || [
    reviews:[{name:'Ignacio R.',rating:5,text:'Frente al mar. Arranque perfecto.',date:Date.now()-86400000*3}]},
   {id:17, name:'Rack Parque Rodó', addr:'Av. Sarmiento 2690, Parque Rodó', type:'bike', lat:-34.9179, lng:-56.1627, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
    reviews:[{name:'Florencia M.',rating:5,text:'Perfecto para ir al parque.',date:Date.now()-86400000*7}]},
-  {id:18, name:'Rack Punta Carretas Shopping', addr:'Ellauri 350, Punta Carretas', type:'both', lat:-34.9213, lng:-56.1398, cost:'Gratuito', schedule:'10:00-22:00', phone:'2711 8888', url:'https://www.puntacarretas.com.uy', covered:true,
+  {id:18, name:'Rack Punta Carretas Shopping', addr:'Ellauri 350, Punta Carretas', type:'both', lat:-34.9156, lng:-56.1483, cost:'Gratuito', schedule:'10:00-22:00', phone:'2711 8888', url:'https://www.puntacarretas.com.uy', covered:true,
    reviews:[{name:'Natalia G.',rating:4,text:'Cubierto y seguro.',date:Date.now()-86400000*1}]},
   {id:19, name:'Rack Scooter 21 de Setiembre', addr:'21 de Setiembre 2400, Pocitos', type:'scooter', lat:-34.9143, lng:-56.1519, cost:'Gratuito', schedule:'24h', phone:'', url:'', covered:false,
    reviews:[{name:'Tomás W.',rating:3,text:'Poca capacidad. Casi siempre lleno.',date:Date.now()-86400000*2}]},
@@ -1207,6 +1207,20 @@ function initMap() {
   }).addTo(leafMap);
   L.control.zoom({position: 'bottomright'}).addTo(leafMap);
   leafMap.on('click', onMapClick);
+
+  // ── UBICACIÓN DEL USUARIO (solo móvil) ──
+  var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile && navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      var lat = pos.coords.latitude;
+      var lng = pos.coords.longitude;
+      var dot = '<div style="width:18px;height:18px;background:#6366f1;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px rgba(99,102,241,.3),0 2px 8px rgba(0,0,0,.2);"></div>';
+      L.marker([lat, lng], {
+        icon: L.divIcon({ className:'', html: dot, iconSize:[18,18], iconAnchor:[9,9] }),
+        zIndexOffset: 1000
+      }).addTo(leafMap).bindPopup('<div style="font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;padding:4px 2px;">📍 Tu ubicación</div>');
+    }, function() {}, { enableHighAccuracy: true });
+  }
 
   // ── CICLOVÍAS OSM ──
   cyclewayLayer = L.layerGroup();
