@@ -550,7 +550,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
             <input type="radio" name="n-covered-opt" value="yes" onchange="el('n-covered').checked=true"> 🏠 Bajo techo
           </label>
           <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e6ed;cursor:pointer;font-size:.85rem;font-weight:500;" id="n-covered-no">
-            <input type="radio" name="n-covered-opt" value="no" checked onchange="el('n-covered').checked=false"> 🌤️ Abierto
+            <input type="radio" name="n-covered-opt" value="no" checked onchange="el('n-covered').checked=false"> 🌤️ Al aire libre
           </label>
         </div>
         <input type="checkbox" id="n-covered" style="display:none">
@@ -628,7 +628,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
             <input type="radio" name="e-covered-opt" value="yes" onchange="el('e-covered').checked=true"> 🏠 Bajo techo
           </label>
           <label style="flex:1;display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1.5px solid #e2e6ed;cursor:pointer;font-size:.85rem;font-weight:500;">
-            <input type="radio" name="e-covered-opt" value="no" onchange="el('e-covered').checked=false"> 🌤️ Abierto
+            <input type="radio" name="e-covered-opt" value="no" onchange="el('e-covered').checked=false"> 🌤️ Al aire libre
           </label>
         </div>
         <input type="checkbox" id="e-covered" style="display:none">
@@ -1553,7 +1553,7 @@ function showDetail(p) {
   html += '<div class="info-grid">';
   html += '<div class="ibox"><div class="ibox-lbl">Estado</div><div class="ibox-val ' + (open ? 'v-green' : 'v-red') + '">' + (open ? 'Abierto' : 'Cerrado') + '</div></div>';
   html += '<div class="ibox"><div class="ibox-lbl">Costo</div><div class="ibox-val v-orange">' + dcost(p.cost) + '</div></div>';
-  html += '<div class="ibox"><div class="ibox-lbl">Tipo</div><div class="ibox-val">' + (p.covered ? '<span style="color:#0277bd">🏠 Bajo techo</span>' : '<span style="color:#f59e0b">🌤️ Abierto</span>') + '</div></div>';
+  html += '<div class="ibox"><div class="ibox-lbl">Tipo</div><div class="ibox-val">' + (p.covered ? '<span style="color:#0277bd">🏠 Bajo techo</span>' : '<span style="color:#f59e0b">🌤️ Al aire libre</span>') + '</div></div>';
   html += '<div class="ibox" style="grid-column:1/-1"><div class="ibox-lbl">Valoración media</div>';
   if (a) {
     html += '<div class="ibox-val v-yellow">★ ' + a + ' / 5 (' + p.reviews.length + ' opinión' + (p.reviews.length !== 1 ? 'es' : '') + ')</div>';
