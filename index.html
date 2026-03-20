@@ -387,10 +387,12 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   </div>
   <!-- Filters -->
   <div class="filters">
-    <button class="fbtn f-bike" id="f-bike" onclick="toggleFilter('bike',this)"><span class="fdot" style="background:#2e7d32"></span>Bicicletas</button>
-    <button class="fbtn f-scooter" id="f-scooter" onclick="toggleFilter('scooter',this)"><span class="fdot" style="background:#0277bd"></span>Monopatines</button>
-    <button class="fbtn f-both" id="f-both" onclick="toggleFilter('both',this)"><span class="fdot" style="background:#e65100"></span>Ambos</button>
-    <button class="fav-filter" id="f-favs" onclick="toggleFavFilter()">⭐ Favoritos</button>
+    <button class="fbtn" id="f-bike" onclick="toggleFilter('bike',this)"><span class="fdot" style="background:#2e7d32"></span>Bicicletas</button>
+    <button class="fbtn" id="f-scooter" onclick="toggleFilter('scooter',this)"><span class="fdot" style="background:#0277bd"></span>Monopatines</button>
+    <button class="fbtn" id="f-both" onclick="toggleFilter('both',this)"><span class="fdot" style="background:#e65100"></span>Ambos</button>
+    <button class="fbtn" id="f-favs" onclick="toggleFavFilter()"><span class="fdot" style="background:#f59e0b"></span>Favoritos</button>
+    <button class="fbtn" id="f-open" onclick="toggleStatusFilter('open')"><span class="fdot" style="background:#2e7d32"></span>Abiertos</button>
+    <button class="fbtn" id="f-closed" onclick="toggleStatusFilter('closed')"><span class="fdot" style="background:#c62828"></span>Cerrados</button>
     <button class="fbtn" id="f-cycleways" onclick="toggleCycleways()"><span class="fdot" style="background:#22c55e"></span>Ciclovías</button>
   </div>
   <!-- Content -->
@@ -957,6 +959,10 @@ function enterApp(user) {
   updateUserChip();
   el('rv-name').value = user.name;
   fetchWeather();
+  // Init filter button styles
+  var fbikeBtn = el('f-bike'); if(fbikeBtn){fbikeBtn.style.borderColor='#2e7d32';fbikeBtn.style.color='#2e7d32';fbikeBtn.style.background='#e8f5e9';}
+  var fscBtn = el('f-scooter'); if(fscBtn){fscBtn.style.borderColor='#0277bd';fscBtn.style.color='#0277bd';fscBtn.style.background='#e3f2fd';}
+  var fbothBtn = el('f-both'); if(fbothBtn){fbothBtn.style.borderColor='#e65100';fbothBtn.style.color='#e65100';fbothBtn.style.background='#fff3e0';}
   setTimeout(initMap, 300);
 }
 
@@ -1019,7 +1025,10 @@ function toggleFav(id) {
 }
 function toggleFavFilter() {
   showOnlyFavs = !showOnlyFavs;
-  el('f-favs').classList.toggle('on', showOnlyFavs);
+  var btn = el('f-favs');
+  btn.style.borderColor = showOnlyFavs ? '#f59e0b' : '';
+  btn.style.color = showOnlyFavs ? '#f59e0b' : '';
+  btn.style.background = showOnlyFavs ? '#fffbeb' : '';
   renderAll();
 }
 function openProfile() {
@@ -1208,18 +1217,20 @@ function initMap() {
   L.control.zoom({position: 'bottomright'}).addTo(leafMap);
   leafMap.on('click', onMapClick);
 
-  // ── UBICACIÓN DEL USUARIO (solo móvil) ──
-  var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  if (isMobile && navigator.geolocation) {
+  // ── UBICACIÓN DEL USUARIO ──
+  if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(pos) {
       var lat = pos.coords.latitude;
       var lng = pos.coords.longitude;
-      var dot = '<div style="width:18px;height:18px;background:#6366f1;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px rgba(99,102,241,.3),0 2px 8px rgba(0,0,0,.2);"></div>';
-      L.marker([lat, lng], {
-        icon: L.divIcon({ className:'', html: dot, iconSize:[18,18], iconAnchor:[9,9] }),
-        zIndexOffset: 1000
-      }).addTo(leafMap).bindPopup('<div style="font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;padding:4px 2px;">📍 Tu ubicación</div>');
-    }, function() {}, { enableHighAccuracy: true });
+      // Solo mostrar si está cerca de Montevideo (evita ubicaciones erróneas en desktop)
+      if (lat > -35.2 && lat < -34.6 && lng > -56.6 && lng < -55.8) {
+        var dot = '<div style="width:18px;height:18px;background:#6366f1;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 4px rgba(99,102,241,.3),0 2px 8px rgba(0,0,0,.2);"></div>';
+        L.marker([lat, lng], {
+          icon: L.divIcon({ className:'', html: dot, iconSize:[18,18], iconAnchor:[9,9] }),
+          zIndexOffset: 1000
+        }).addTo(leafMap).bindPopup('<div style="font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;padding:4px 2px;">📍 Tu ubicación</div>');
+      }
+    }, function() {}, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
   }
 
   // ── CICLOVÍAS OSM ──
@@ -1374,15 +1385,32 @@ function findPark(id) {
   for (var i = 0; i < parks.length; i++) { if (parks[i].id === id) return parks[i]; }
   return null;
 }
+var filterStatus = 'all';
 function visibleParks() {
-  return parks.filter(function(p) {
+  var result = parks.filter(function(p) {
     if (!filters[p.type]) return false;
     if (showOnlyFavs && !isFavorite(p.id)) return false;
+    if (filterStatus === 'open' && !isOpen(p.schedule)) return false;
+    if (filterStatus === 'closed' && isOpen(p.schedule)) return false;
     if (!searchQuery) return true;
     var q = searchQuery.toLowerCase();
     return p.name.toLowerCase().indexOf(q) > -1
         || p.addr.toLowerCase().indexOf(q) > -1;
   });
+  result.sort(function(a, b) { return (isOpen(a.schedule) ? 0 : 1) - (isOpen(b.schedule) ? 0 : 1); });
+  return result;
+}
+function toggleStatusFilter(status) {
+  filterStatus = filterStatus === status ? 'all' : status;
+  var openBtn = el('f-open');
+  var closedBtn = el('f-closed');
+  openBtn.style.borderColor = filterStatus === 'open' ? '#2e7d32' : '';
+  openBtn.style.color = filterStatus === 'open' ? '#2e7d32' : '';
+  openBtn.style.background = filterStatus === 'open' ? '#e8f5e9' : '';
+  closedBtn.style.borderColor = filterStatus === 'closed' ? '#c62828' : '';
+  closedBtn.style.color = filterStatus === 'closed' ? '#c62828' : '';
+  closedBtn.style.background = filterStatus === 'closed' ? '#ffebee' : '';
+  renderAll();
 }
 function renderAll() {
   renderList();
@@ -1623,9 +1651,12 @@ function clearSearch() {
 }
 function toggleFilter(type, btn) {
   filters[type] = !filters[type];
-  var cls = {bike:'f-bike', scooter:'f-scooter', both:'f-both'}[type];
-  btn.classList.toggle(cls, filters[type]);
-  btn.style.opacity = filters[type] ? '1' : '0.4';
+  var colors = {bike:['#2e7d32','#e8f5e9'], scooter:['#0277bd','#e3f2fd'], both:['#e65100','#fff3e0']};
+  var c = colors[type];
+  btn.style.borderColor = filters[type] ? c[0] : '';
+  btn.style.color = filters[type] ? c[0] : '';
+  btn.style.background = filters[type] ? c[1] : '';
+  btn.style.opacity = filters[type] ? '1' : '0.45';
   renderAll();
 }
 
