@@ -105,13 +105,26 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .hdr-right { display:flex; align-items:center; gap:6px; }
 .weather-bar { display:none; padding:6px 12px; background:#f8f9ff; border-bottom:1px solid #e0e7ff; flex-shrink:0; font-family:'Inter',sans-serif; }
 .weather-bar.show { display:block; }
-.wb-row { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-.wb-pill { display:inline-flex; align-items:center; gap:3px; padding:4px 9px; border-radius:100px; background:#fff; border:1px solid #e0e7ff; color:#4338ca; font-weight:600; white-space:nowrap; font-size:.73rem; }
-.wb-sep { width:1px; height:14px; background:#e0e7ff; flex-shrink:0; }
-.wb-rain-pill { display:inline-flex; align-items:center; gap:3px; padding:4px 9px; border-radius:100px; font-weight:700; font-size:.73rem; white-space:nowrap; border:1px solid; }
+.wb-sep { display:none; }
 .wb-rain-low { background:#f0fdf4; border-color:#bbf7d0; color:#16a34a; }
 .wb-rain-med { background:#fefce8; border-color:#fde047; color:#b45309; }
 .wb-rain-high { background:#fef2f2; border-color:#fecaca; color:#dc2626; }
+
+/* Mobile: grid 4 columnas */
+@media (max-width:699px) {
+  .wb-row { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; }
+  .wb-pill { display:flex; align-items:center; justify-content:center; gap:3px; padding:5px 4px; border-radius:10px; background:#fff; border:1px solid #e0e7ff; color:#4338ca; font-weight:600; font-size:.68rem; text-align:center; }
+  .wb-rain-pill { display:flex; align-items:center; justify-content:center; gap:3px; padding:5px 4px; border-radius:10px; font-weight:700; font-size:.68rem; border:1px solid; }
+}
+
+/* Desktop: pills en línea con separadores */
+@media (min-width:700px) {
+  .weather-bar.show { display:flex; align-items:center; }
+  .wb-row { display:flex; align-items:center; gap:8px; }
+  .wb-sep { display:block; width:1px; height:14px; background:#e0e7ff; flex-shrink:0; }
+  .wb-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; background:#fff; border:1px solid #e0e7ff; color:#4338ca; font-weight:600; white-space:nowrap; font-size:.75rem; }
+  .wb-rain-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; font-weight:700; font-size:.75rem; white-space:nowrap; border:1px solid; }
+}
 .user-chip { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:100px; background:#f0f4ff; border:1px solid #e0e7ff; }
 .user-av { width:28px; height:28px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; color:#fff; font-weight:700; overflow:hidden; flex-shrink:0; min-width:28px; }
 .user-av img { width:28px; height:28px; object-fit:cover; border-radius:50%; display:block; }
