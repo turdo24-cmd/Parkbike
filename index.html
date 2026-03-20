@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#6366f1">
 
 <!-- Icono para pantalla de inicio iOS y Android -->
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='url(%23g)'/><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%234f46e5'/><stop offset='1' stop-color='%23a855f7'/></linearGradient></defs><text y='.9em' font-size='65' x='15'>🚲</text></svg>">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234f46e5'/%3E%3Cstop offset='50%25' stop-color='%237c3aed'/%3E%3Cstop offset='100%25' stop-color='%23a855f7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' rx='115' fill='url(%23g)'/%3E%3C!-- Wheels --%3E%3Ccircle cx='160' cy='330' r='90' stroke='white' stroke-width='28' fill='none'/%3E%3Ccircle cx='352' cy='330' r='90' stroke='white' stroke-width='28' fill='none'/%3E%3Ccircle cx='160' cy='330' r='22' fill='white'/%3E%3Ccircle cx='352' cy='330' r='22' fill='white'/%3E%3C!-- Frame --%3E%3Cpath d='M160 330 L245 170 L352 330' stroke='%23fde68a' stroke-width='28' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M245 170 L310 330' stroke='%23fde68a' stroke-width='28' stroke-linecap='round' fill='none'/%3E%3C!-- Fork --%3E%3Cpath d='M280 170 L352 170 L352 330' stroke='%23fbcfe8' stroke-width='28' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C!-- Seat --%3E%3Cline x1='218' y1='170' x2='268' y2='170' stroke='white' stroke-width='28' stroke-linecap='round'/%3E%3C!-- Handlebar --%3E%3Cline x1='330' y1='170' x2='382' y2='170' stroke='white' stroke-width='28' stroke-linecap='round'/%3E%3Cline x1='352' y1='145' x2='352' y2='175' stroke='white' stroke-width='28' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;ParkBike&quot;,&quot;short_name&quot;:&quot;ParkBike&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;%23f0f4ff&quot;,&quot;theme_color&quot;:&quot;%236366f1&quot;,&quot;start_url&quot;:&quot;/&quot;}">
 <title>ParkBike</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -257,24 +257,22 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 @media (max-width:699px) {
   .content { display:block; }
   #map { position:absolute; inset:0; height:100%; }
-  .sidebar { position:absolute; bottom:0; left:0; right:0; width:100%; height:calc(100% - 50px); border-left:none; border-radius:18px 18px 0 0; box-shadow:0 -4px 24px rgba(0,0,0,.15); transform:translateY(calc(100% - 155px)); transition:transform .35s ease; z-index:50; }
+  .sidebar { position:absolute; bottom:0; left:0; right:0; width:100%; height:calc(100% - 50px); border-left:none; border-radius:18px 18px 0 0; box-shadow:0 -4px 24px rgba(0,0,0,.15); transform:translateY(calc(100% - 72px)); transition:transform .35s ease; z-index:50; }
   .sidebar.up { transform:translateY(0); }
-  .sb-head { cursor:pointer; padding-top:8px; }
+  .sb-head { cursor:pointer; padding-top:8px; user-select:none; -webkit-user-select:none; }
   .sb-handle { width:36px; height:4px; background:#e2e6ed; border-radius:2px; margin:0 auto 8px; }
   .btn-add { display:none; }
   #fab { display:none; position:absolute; bottom:165px; right:14px; z-index:200; width:50px; height:50px; border-radius:50%; background:#2e7d32; color:#fff; border:none; cursor:pointer; font-size:1.4rem; align-items:center; justify-content:center; box-shadow:0 4px 16px rgba(46,125,50,.4); }
   #btn-locate { display:flex; position:absolute; bottom:105px; right:14px; z-index:200; width:44px; height:44px; border-radius:50%; background:#fff; color:#6366f1; border:2px solid #e0e7ff; cursor:pointer; font-size:1.2rem; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,.15); }
 
-  /* Mobile filters: two rows */
-  .filters { height:auto !important; flex-wrap:wrap; gap:5px; padding:7px 10px; }
-  .fbtn { font-size:.73rem; padding:5px 9px; }
+  /* Mobile: single scrollable filter row */
+  .filters { height:40px !important; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding:0 10px; gap:5px; }
+  .filters::-webkit-scrollbar { display:none; }
+  .fbtn { font-size:.72rem; padding:4px 9px; flex-shrink:0; }
+  #filters-row2 { display:none !important; }
 
-  /* Mobile search bar: no nearest button inline */
+  /* Hide nearest button from search bar on mobile */
   .btn-nearest { display:none !important; }
-
-  /* Mobile second filter row: nearest + cycleways compact */
-  .filters-row2 { display:flex; gap:5px; width:100%; padding:0 10px 7px; background:#fff; border-bottom:1px solid #e2e6ed; }
-  .fbtn-compact { display:flex; align-items:center; gap:4px; padding:5px 10px; border-radius:100px; border:1.5px solid #e2e6ed; background:none; color:#6b7280; font-family:'Inter',sans-serif; font-size:.73rem; font-weight:500; cursor:pointer; flex:1; justify-content:center; }
 }
 @media (min-width:700px) {
   .sb-handle { display:none; }
@@ -575,15 +573,24 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
     <div class="sidebar" id="sidebar">
       <div class="sb-handle"></div>
       <div class="sb-head" onclick="toggleSheet()">
-        <div class="sb-title">📍 Parkings en Montevideo</div>
-        <div class="sb-count" id="sb-count">Cargando…</div>
+        <div class="sb-handle"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div class="sb-title">📍 Parkings en Montevideo</div>
+            <div class="sb-count" id="sb-count">Cargando…</div>
+          </div>
+          <div id="sheet-arrow" style="display:none;width:28px;height:28px;background:#f0f4ff;border:1.5px solid #e0e7ff;border-radius:50%;align-items:center;justify-content:center;font-size:.85rem;color:#6366f1;flex-shrink:0;">↑</div>
+        </div>
       </div>
-      <div id="recent-section" style="display:none;padding:10px 14px 0;border-bottom:1px solid #e2e6ed;">
-        <div style="font-size:.63rem;color:#94a3b8;font-family:Sora,sans-serif;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;">🕐 Vistos recientemente</div>
-        <div id="recent-list" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;"></div>
+      <div id="recent-section" style="display:none;border-bottom:1px solid #e2e6ed;">
+        <div onclick="toggleRecent()" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;">
+          <div style="font-size:.63rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">🕐 Vistos recientemente</div>
+          <div id="recent-toggle-icon" style="font-size:.7rem;color:#94a3b8;">▾</div>
+        </div>
+        <div id="recent-list" style="display:flex;gap:6px;overflow-x:auto;padding:0 14px 10px;scrollbar-width:none;"></div>
       </div>
-      <div style="padding:8px 14px;border-bottom:1px solid #e2e6ed;">
-        <button onclick="openSuggest()" style="width:100%;padding:9px;background:#f0f4ff;border:1.5px dashed #c7d2fe;border-radius:10px;color:#6366f1;font-family:Inter,sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;">＋ Sugerir un parking</button>
+      <div style="padding:6px 14px;border-bottom:1px solid #e2e6ed;">
+        <button onclick="openSuggest()" style="width:100%;padding:8px;background:#f8fafc;border:1px dashed #c7d2fe;border-radius:10px;color:#6366f1;font-family:Inter,sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;">＋ Sugerir un parking</button>
       </div>
       <div class="park-list" id="park-list"></div>
       <!-- Detail -->
@@ -1341,12 +1348,19 @@ function addRecent(id) {
   localStorage.setItem('recent_' + currentUser.email, JSON.stringify(recent));
   renderRecent();
 }
+var recentExpanded = false;
+function toggleRecent() {
+  recentExpanded = !recentExpanded;
+  el('recent-list').style.display = recentExpanded ? 'flex' : 'none';
+  el('recent-toggle-icon').textContent = recentExpanded ? '▴' : '▾';
+}
 function renderRecent() {
   var recent = getRecent().map(function(id) { return findPark(id); }).filter(Boolean);
   var section = el('recent-section');
   var list = el('recent-list');
   if (!recent.length || !section || !list) { if (section) section.style.display = 'none'; return; }
   section.style.display = 'block';
+  list.style.display = recentExpanded ? 'flex' : 'none';
   list.innerHTML = recent.map(function(p) {
     var open = isOpen(p.schedule);
     var color = {bike:'#2e7d32', scooter:'#0277bd', both:'#e65100'}[p.type];
@@ -1756,12 +1770,14 @@ function enterApp(user) {
   el('rv-name').value = user.name;
   fetchWeather();
   setTimeout(renderRecent, 500);
-  // Show mobile second row
+  // Show mobile second row and arrow
   if (window.innerWidth < 700) {
     var row2 = el('filters-row2');
     if (row2) row2.style.display = 'flex';
     var cycMain = el('f-cycleways');
     if (cycMain) cycMain.style.display = 'none';
+    var arrow = el('sheet-arrow');
+    if (arrow) arrow.style.display = 'flex';
   }
   // Init filter button styles
   var fbikeBtn = el('f-bike'); if(fbikeBtn){fbikeBtn.style.borderColor='#2e7d32';fbikeBtn.style.color='#2e7d32';fbikeBtn.style.background='#e8f5e9';}
@@ -2525,9 +2541,37 @@ function closeDetail() {
 // ═══════════════════════════════════════════════════
 // SHEET (mobile)
 // ═══════════════════════════════════════════════════
-function toggleSheet() { sheetUp ? collapseSheet() : expandSheet(); }
-function expandSheet() { el('sidebar').classList.add('up'); sheetUp = true; }
-function collapseSheet() { el('sidebar').classList.remove('up'); sheetUp = false; }
+var sheetState = 0; // 0=peek, 1=half, 2=full
+function toggleSheet() {
+  if (window.innerWidth >= 700) return;
+  sheetState = (sheetState + 1) % 3;
+  var sb = el('sidebar');
+  var arrow = el('sheet-arrow');
+  if (sheetState === 0) {
+    sb.style.transform = 'translateY(calc(100% - 72px))';
+    if (arrow) arrow.textContent = '↑';
+  } else if (sheetState === 1) {
+    sb.style.transform = 'translateY(40%)';
+    if (arrow) arrow.textContent = '↑';
+  } else {
+    sb.style.transform = 'translateY(0)';
+    if (arrow) arrow.textContent = '↓';
+  }
+}
+function expandSheet() {
+  if (window.innerWidth >= 700) return;
+  sheetState = 2;
+  el('sidebar').style.transform = 'translateY(0)';
+  el('sidebar').classList.add('up');
+}
+function collapseSheet() {
+  if (window.innerWidth >= 700) return;
+  sheetState = 0;
+  el('sidebar').style.transform = 'translateY(calc(100% - 72px))';
+  el('sidebar').classList.remove('up');
+  var arrow = el('sheet-arrow');
+  if (arrow) arrow.textContent = '↑';
+}
 
 // ═══════════════════════════════════════════════════
 // FILTERS
