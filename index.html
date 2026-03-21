@@ -254,6 +254,9 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .btn-rev { width:100%; margin-top:12px; padding:13px; background:none; border:1.5px dashed #e2e8f0; color:#94a3b8; border-radius:14px; cursor:pointer; font-family:'Inter',sans-serif; font-size:.84rem; transition:all .2s; }
 .btn-rev:hover { border-color:#6366f1; color:#6366f1; }
 .btn-dir { width:100%; margin-top:10px; padding:14px; background:linear-gradient(135deg,#2e7d32,#388e3c); color:#fff; border:none; border-radius:14px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:700; font-size:.88rem; box-shadow:0 4px 12px rgba(46,125,50,.3); }
+.det-fav-btn { width:100%; margin-top:8px; padding:12px; background:#fff; border:1.5px solid #e2e8f0; border-radius:14px; cursor:pointer; font-family:'Inter',sans-serif; font-weight:600; font-size:.86rem; color:#94a3b8; display:flex; align-items:center; justify-content:center; gap:6px; transition:all .2s; }
+.det-fav-btn:hover { border-color:#fbbf24; color:#f59e0b; background:#fffbeb; }
+.det-fav-btn.on { background:#fffbeb; border-color:#fbbf24; color:#f59e0b; font-weight:700; }
 
 /* MOBILE SHEET */
 @media (max-width:699px) {
@@ -271,8 +274,8 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   .filters { height:40px !important; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding:0 10px; gap:5px; }
   .filters::-webkit-scrollbar { display:none; }
   .fbtn { font-size:.72rem; padding:4px 9px; flex-shrink:0; }
+  #f-cycleways { display:flex !important; }
   #filters-row2 { display:none !important; }
-  #f-cycleways { display:flex !important; }  /* visible en mobile también */
 
   /* Hide nearest button from search bar on mobile */
   .btn-nearest { display:none !important; }
@@ -567,6 +570,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
         <div id="mc-pills" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;"></div>
         <div id="mc-info" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;"></div>
         <div id="mc-phone"></div>
+        <div id="mc-fav-wrap" style="margin-bottom:8px;"></div>
         <div id="mc-btns" style="display:flex;gap:8px;margin-top:2px;">
           <button id="mc-dir-btn" style="flex:1;padding:10px;background:#f0f4ff;border:1.5px solid #e0e7ff;color:#6366f1;border-radius:12px;font-family:Inter,sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;text-align:center;">🗺️ Cómo llegar</button>
           <button onclick="closeMapCard()" style="flex:1;padding:10px;background:#f1f5f9;border:1.5px solid #e2e8f0;color:#64748b;border-radius:12px;font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;text-align:center;">✕ Cerrar</button>
@@ -588,9 +592,9 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
       <div id="recent-section" style="display:none;border-bottom:1px solid #e2e6ed;">
         <div onclick="toggleRecent()" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;">
           <div style="font-size:.63rem;color:#94a3b8;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;">🕐 Vistos recientemente</div>
-          <div id="recent-toggle-icon" style="font-size:.7rem;color:#94a3b8;">▾</div>
+          <div id="recent-toggle-icon" style="width:24px;height:24px;background:#f0f4ff;border:1.5px solid #e0e7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:#6366f1;flex-shrink:0;">▾</div>
         </div>
-        <div id="recent-list" style="display:flex;gap:6px;overflow-x:auto;padding:0 14px 10px;scrollbar-width:none;"></div>
+        <div id="recent-list" style="display:none;flex-direction:column;gap:4px;padding:4px 14px 10px;"></div>
       </div>
       <div style="padding:6px 14px;border-bottom:1px solid #e2e6ed;">
         <button onclick="openSuggest()" style="width:100%;padding:8px;background:#f8fafc;border:1px dashed #c7d2fe;border-radius:10px;color:#6366f1;font-family:Inter,sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;">＋ Sugerir un parking</button>
@@ -1356,6 +1360,7 @@ function toggleRecent() {
   recentExpanded = !recentExpanded;
   el('recent-list').style.display = recentExpanded ? 'flex' : 'none';
   el('recent-toggle-icon').textContent = recentExpanded ? '▴' : '▾';
+  el('recent-list').style.flexDirection = 'column';
 }
 function renderRecent() {
   var recent = getRecent().map(function(id) { return findPark(id); }).filter(Boolean);
@@ -1366,10 +1371,9 @@ function renderRecent() {
   list.style.display = recentExpanded ? 'flex' : 'none';
   list.innerHTML = recent.map(function(p) {
     var open = isOpen(p.schedule);
-    var color = {bike:'#2e7d32', scooter:'#0277bd', both:'#e65100'}[p.type];
-    return '<div onclick="selectPark(' + p.id + ')" style="flex-shrink:0;padding:8px 12px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;cursor:pointer;min-width:130px;max-width:160px;">'
-      + '<div style="font-size:.72rem;font-weight:600;font-family:Sora,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1a1f2e;">' + p.name + '</div>'
-      + '<div style="font-size:.65rem;color:#94a3b8;margin-top:2px;">' + (open ? '<span style="color:#2e7d32">● Abierto</span>' : '<span style="color:#c62828">● Cerrado</span>') + '</div>'
+    return '<div onclick="selectPark(' + p.id + ')" style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;cursor:pointer;">'
+      + '<div style="font-size:.76rem;font-weight:600;font-family:Sora,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#1a1f2e;flex:1;min-width:0;">' + p.name + '</div>'
+      + '<div style="font-size:.65rem;margin-left:8px;flex-shrink:0;">' + (open ? '<span style="color:#2e7d32">● Abierto</span>' : '<span style="color:#c62828">● Cerrado</span>') + '</div>'
       + '</div>';
   }).join('');
 }
@@ -2348,34 +2352,40 @@ function showPopup(p) {
   // Pills
   var typeLbl = {bike:'🚲 Bici', scooter:'🛴 Scooter', both:'🚲🛴 Ambos'}[p.type];
   var typeCls = {bike:'p-bike', scooter:'p-scooter', both:'p-both'}[p.type];
-  var pillsHtml = '<span class="pill ' + typeCls + '">' + typeLbl + '</span>';
-  pillsHtml += ' <span class="pill ' + (open ? 'p-open' : 'p-closed') + '">' + (open ? '● Abierto' : '● Cerrado') + '</span>';
-  if (p.covered) pillsHtml += ' <span class="pill" style="background:#e0f2fe;color:#0277bd">🏠 Bajo techo</span>';
+  var pillsHtml = '<span class="pill ' + typeCls + '" style="font-size:.74rem;padding:5px 12px;">' + typeLbl + '</span>';
+  pillsHtml += ' <span class="pill ' + (open ? 'p-open' : 'p-closed') + '" style="font-size:.74rem;padding:5px 12px;">' + (open ? '● Abierto' : '● Cerrado') + '</span>';
+  if (p.covered) pillsHtml += ' <span class="pill" style="background:#e0f2fe;color:#0277bd;font-size:.74rem;padding:5px 12px;">🏠 Bajo techo</span>';
   el('mc-pills').innerHTML = pillsHtml;
   // Info boxes
   var costTxt = dcost(p.cost).replace(/[🟢💲]/g,'').trim();
-  var infoHtml = '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px;text-align:center;">'
-    + '<div style="font-size:.58rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Costo</div>'
-    + '<div style="font-size:.82rem;font-weight:700;color:#e65100;">' + costTxt + '</div></div>';
+  var infoHtml = '<div style="background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:7px 8px;text-align:center;">'
+    + '<div style="font-size:.56rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Costo</div>'
+    + '<div style="font-size:.8rem;font-weight:600;color:#e65100;">' + costTxt + '</div></div>';
   var typeLbl2 = p.covered ? '🏠 Bajo techo' : '🌤️ Al aire libre';
-  infoHtml += '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px;text-align:center;">'
-    + '<div style="font-size:.58rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Cobertura</div>'
-    + '<div style="font-size:.78rem;font-weight:700;color:#374151;">' + typeLbl2 + '</div></div>';
-  if (a) infoHtml += '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px;text-align:center;">'
-    + '<div style="font-size:.58rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;">Rating</div>'
-    + '<div style="font-size:.82rem;font-weight:700;color:#f59e0b;">★ ' + a + '</div></div>';
+  infoHtml += '<div style="background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:7px 8px;text-align:center;">'
+    + '<div style="font-size:.56rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Cobertura</div>'
+    + '<div style="font-size:.75rem;font-weight:600;color:#64748b;">' + typeLbl2 + '</div></div>';
+  if (a) infoHtml += '<div style="background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:7px 8px;text-align:center;">'
+    + '<div style="font-size:.56rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Rating</div>'
+    + '<div style="font-size:.8rem;font-weight:600;color:#f59e0b;">★ ' + a + '</div></div>';
   el('mc-info').innerHTML = infoHtml;
   // Phone + Web buttons
   var contactHtml = '';
   if (p.phone || p.url) {
     contactHtml = '<div style="display:flex;gap:6px;margin-bottom:8px;">';
-    if (p.phone) contactHtml += '<a href="tel:' + p.phone + '" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:10px;color:#1b5e20;text-decoration:none;font-family:Inter,sans-serif;font-size:.76rem;font-weight:600;">📞 ' + p.phone + '</a>';
-    if (p.url) contactHtml += '<a href="' + p.url + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;background:#fce4ec;border:1.5px solid #f48fb1;border-radius:10px;color:#880e4f;text-decoration:none;font-family:Inter,sans-serif;font-size:.76rem;font-weight:600;">' + urlIcon(p.url) + ' ' + urlLabel(p.url) + '</a>';
+    if (p.phone) contactHtml += '<a href="tel:' + p.phone + '" style="flex:1;display:flex;align-items:center;gap:7px;padding:9px 12px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;color:#16a34a;text-decoration:none;font-family:Inter,sans-serif;font-size:.78rem;font-weight:600;"><span style="font-size:1rem;">📞</span><div><div style="font-size:.58rem;opacity:.7;text-transform:uppercase;letter-spacing:.5px;">Teléfono</div><div>' + p.phone + '</div></div></a>';
+    if (p.url) contactHtml += '<a href="' + p.url + '" target="_blank" rel="noopener" style="flex:1;display:flex;align-items:center;gap:7px;padding:9px 12px;background:#f0f4ff;border:1.5px solid #c7d2fe;border-radius:12px;color:#4338ca;text-decoration:none;font-family:Inter,sans-serif;font-size:.78rem;font-weight:600;"><span style="font-size:1rem;">' + urlIcon(p.url) + '</span><div><div style="font-size:.58rem;opacity:.7;text-transform:uppercase;letter-spacing:.5px;">' + urlLabel(p.url) + '</div><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px;">' + urlShort(p.url) + '</div></div></a>';
     contactHtml += '</div>';
   }
   el('mc-phone').innerHTML = contactHtml;
   // Buttons
   el('mc-dir-btn').onclick = function() { window.open('https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng + '&travelmode=bicycling', '_blank'); };
+  // Botón favorito en map-card
+  var favWrap = el('mc-fav-wrap');
+  if (favWrap && currentUser) {
+    var isFavNow = isFavorite(p.id);
+    favWrap.innerHTML = '<button onclick="toggleFav(' + p.id + ');showPopup(findPark(' + p.id + '))" style="width:100%;padding:10px;background:' + (isFavNow ? '#fffbeb' : '#fff') + ';border:1.5px solid ' + (isFavNow ? '#fbbf24' : '#e2e8f0') + ';border-radius:12px;cursor:pointer;font-family:Inter,sans-serif;font-weight:600;font-size:.84rem;color:' + (isFavNow ? '#f59e0b' : '#94a3b8') + ';display:flex;align-items:center;justify-content:center;gap:6px;">' + (isFavNow ? '⭐ En tus favoritos' : '☆ Agregar a favoritos') + '</button>';
+  } else if (favWrap) { favWrap.innerHTML = ''; }
   card.style.display = 'block';
 }
 function closeMapCard() {
@@ -2824,21 +2834,28 @@ function deleteReview(pid, idx) {
 // ═══════════════════════════════════════════════════
 // MOBILE SHEET
 // ═══════════════════════════════════════════════════
+function updateSheetArrow() {
+  var arrow = el('sheet-arrow');
+  if (arrow) arrow.textContent = sheetUp ? '↓' : '↑';
+}
 function toggleSheet() {
   if (window.innerWidth >= 700) return;
   var sb = el('sidebar');
   sheetUp = !sheetUp;
   sb.classList.toggle('up', sheetUp);
+  updateSheetArrow();
 }
 function expandSheet() {
   if (window.innerWidth >= 700) return;
   sheetUp = true;
   el('sidebar').classList.add('up');
+  updateSheetArrow();
 }
 function collapseSheet() {
   if (window.innerWidth >= 700) return;
   sheetUp = false;
   el('sidebar').classList.remove('up');
+  updateSheetArrow();
 }
 
 // Init
