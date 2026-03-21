@@ -140,6 +140,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .user-av img { width:28px; height:28px; object-fit:cover; border-radius:50%; display:block; }
 .user-nm { font-size:.75rem; font-weight:600; color:#2e7d32; max-width:72px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .btn-out { background:none; border:none; color:#9ca3af; font-size:.72rem; cursor:pointer; padding:2px 4px; }
+@media (max-width:699px) { .btn-out { display:none; } }
 .btn-add { display:none; padding:7px 13px; border-radius:100px; background:#2e7d32; color:#fff; font-family:'Inter',sans-serif; font-weight:700; font-size:.78rem; border:none; cursor:pointer; }
 .btn-adm { padding:7px 12px; border-radius:100px; border:1px solid #e2e6ed; background:#fff; color:#6b7280; font-family:'Inter',sans-serif; font-size:.78rem; cursor:pointer; }
 .btn-adm.on { border-color:#7c3aed; color:#7c3aed; background:#f5f3ff; }
@@ -274,10 +275,17 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   #fab { display:none; position:absolute; bottom:170px; right:14px; z-index:200; width:46px; height:46px; border-radius:50%; background:#2e7d32; color:#fff; border:3px solid #fff; cursor:pointer; font-size:1.5rem; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(46,125,50,.5); }
   #btn-locate { display:flex; position:absolute; bottom:105px; right:14px; z-index:200; width:44px; height:44px; border-radius:50%; background:#fff; color:#6366f1; border:2px solid #e0e7ff; cursor:pointer; font-size:1.2rem; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,.15); }
 
-  /* Mobile: 2 filas compactas */
-  .filters { height:auto !important; display:grid !important; grid-template-columns:repeat(3,1fr); grid-template-rows:auto auto; padding:5px 8px; gap:4px; overflow:visible; }
-  .fbtn { font-size:.68rem; padding:5px 4px; text-align:center; justify-content:center; }
-  #f-cycleways { display:flex !important; }
+  /* Mobile: fila 1 = 3 botones, fila 2 = 4 botones */
+  .filters { height:auto !important; display:grid !important; grid-template-columns:repeat(4,1fr); padding:5px 8px; gap:4px; overflow:visible; }
+  .fbtn { font-size:.62rem; padding:5px 3px; text-align:center; justify-content:center; }
+  #f-bike, #f-scooter, #f-both { grid-column:span 1; }
+  #f-bike { grid-column:1; grid-row:1; }
+  #f-scooter { grid-column:2; grid-row:1; }
+  #f-both { grid-column:3 / span 2; grid-row:1; }
+  #f-cycleways { display:flex !important; grid-column:1; grid-row:2; }
+  #f-favs { grid-column:2; grid-row:2; }
+  #f-open { grid-column:3; grid-row:2; }
+  #f-closed { grid-column:4; grid-row:2; }
   #filters-row2 { display:none !important; }
 
   /* Hide nearest button from search bar on mobile */
@@ -2045,11 +2053,8 @@ function initMap() {
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap © CARTO', subdomains: 'abcd', maxZoom: 19
   }).addTo(leafMap);
-  L.control.zoom({position: 'bottomright'}).addTo(leafMap);
-  // Estilo zoom mobile
-  var zoomStyle = document.createElement('style');
-  zoomStyle.textContent = '@media(max-width:699px){.leaflet-control-zoom{margin-bottom:180px!important;margin-right:12px!important;}.leaflet-control-zoom a{width:36px!important;height:36px!important;line-height:36px!important;font-size:1.2rem!important;box-shadow:0 2px 8px rgba(0,0,0,.2)!important;}}';
-  document.head.appendChild(zoomStyle);
+  // Zoom solo en desktop
+  if (window.innerWidth >= 700) L.control.zoom({position: 'bottomright'}).addTo(leafMap);
   leafMap.on('click', onMapClick);
   leafMap.on('click', function() { closeMapCard(); });
 
