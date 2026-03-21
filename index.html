@@ -174,8 +174,8 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .fbtn.f-bike { border-color:#2e7d32; color:#2e7d32; background:#e8f5e9; }
 .fbtn.f-scooter { border-color:#0277bd; color:#0277bd; background:#e3f2fd; }
 .fbtn.f-both { border-color:#e65100; color:#e65100; background:#fff3e0; }
-.fbtn.f-cycleways-btn { }
-.fbtn.f-cycleways-btn.active { }
+.fbtn.f-cycleways-btn { border-color:#86efac; color:#16a34a; }
+.fbtn.f-cycleways-btn.active { border-color:#16a34a; color:#16a34a; background:#f0fdf4; font-weight:600; }
 .fav-filter { display:flex; align-items:center; gap:5px; padding:5px 12px; border-radius:100px; border:1.5px solid #e2e6ed; background:none; color:#6b7280; font-family:'Inter',sans-serif; font-size:.78rem; font-weight:500; cursor:pointer; white-space:nowrap; flex-shrink:0; }
 .fav-filter.on { border-color:#f59e0b; color:#f59e0b; background:#fffbeb; }
 .fdot { width:7px; height:7px; border-radius:50%; }
@@ -272,6 +272,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   .filters::-webkit-scrollbar { display:none; }
   .fbtn { font-size:.72rem; padding:4px 9px; flex-shrink:0; }
   #filters-row2 { display:none !important; }
+  #f-cycleways { display:flex !important; }  /* visible en mobile también */
 
   /* Hide nearest button from search bar on mobile */
   .btn-nearest { display:none !important; }
@@ -2094,12 +2095,14 @@ function toggleCycleways() {
   cyclewaysVisible = !cyclewaysVisible;
   var btn = el('f-cycleways');
   var btnMob = el('f-cycleways-mob');
-  [btn, btnMob].forEach(function(b) {
-    if (!b) return;
-    b.style.borderColor = cyclewaysVisible ? '#22c55e' : '';
-    b.style.color = cyclewaysVisible ? '#16a34a' : '';
-    b.style.background = cyclewaysVisible ? '#f0fdf4' : '';
-  });
+  // Desktop: usa clase active (CSS maneja el estilo)
+  if (btn) btn.classList.toggle('active', cyclewaysVisible);
+  // Mobile: inline styles
+  if (btnMob) {
+    btnMob.style.borderColor = cyclewaysVisible ? '#22c55e' : '';
+    btnMob.style.color = cyclewaysVisible ? '#16a34a' : '';
+    btnMob.style.background = cyclewaysVisible ? '#f0fdf4' : '';
+  }
   if (cyclewaysVisible) {
     if (leafMap && !leafMap.hasLayer(cyclewayLayer)) cyclewayLayer.addTo(leafMap);
   } else {
