@@ -2919,6 +2919,19 @@ function collapseSheet() {
 // Init
 window.addEventListener('DOMContentLoaded', function() {
   showOnboarding();
+  // Ocultar btn-locate cuando el sheet sube — funciona con cualquier método incluyendo iOS
+  var sidebarEl = document.getElementById('sidebar');
+  if (sidebarEl) {
+    sidebarEl.addEventListener('transitionend', function() {
+      if (window.innerWidth >= 700) return;
+      // Detectar posición real via getBoundingClientRect
+      var rect = sidebarEl.getBoundingClientRect();
+      var windowH = window.innerHeight;
+      // Si el top del sidebar está a menos del 70% de la pantalla = está subido
+      var isUp = rect.top < windowH * 0.70;
+      setLocateVisibility(!isUp);
+    });
+  }
   // Labels cortos en mobile
   if (window.innerWidth < 700) {
     var mobileLabels = {
