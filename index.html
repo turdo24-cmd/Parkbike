@@ -273,7 +273,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   .sb-handle { width:36px; height:4px; background:#e2e6ed; border-radius:2px; margin:0 auto 8px; }
   .btn-add { display:none; }
   #fab { display:none; position:absolute; bottom:170px; right:14px; z-index:200; width:46px; height:46px; border-radius:50%; background:#2e7d32; color:#fff; border:3px solid #fff; cursor:pointer; font-size:1.5rem; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(46,125,50,.5); }
-  #btn-locate { display:flex; position:absolute; bottom:105px; right:14px; z-index:200; width:44px; height:44px; border-radius:50%; background:#fff; color:#6366f1; border:2px solid #e0e7ff; cursor:pointer; font-size:1.2rem; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+  #btn-locate { display:flex; position:absolute; bottom:175px; right:14px; z-index:200; width:44px; height:44px; border-radius:50%; background:#fff; color:#6366f1; border:2px solid #e0e7ff; cursor:pointer; font-size:1.2rem; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,.15); }
 
   /* Mobile: fila 1 = 3 botones, fila 2 = 4 botones */
   .filters { height:auto !important; display:grid !important; grid-template-columns:repeat(4,1fr); padding:5px 8px; gap:4px; overflow:visible; }
@@ -2370,14 +2370,14 @@ function showPopup(p) {
   el('mc-pills').innerHTML = pillsHtml;
   // Info boxes
   var costTxt = dcost(p.cost).replace(/[🟢💲]/g,'').trim();
-  var infoHtml = '<div style="background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:7px 8px;text-align:center;">'
+  var infoHtml = '<div style="background:#fff;border:1.5px solid #94a3b8;border-radius:10px;padding:7px 8px;text-align:center;">'
     + '<div style="font-size:.58rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600;">Costo</div>'
     + '<div style="font-size:.8rem;font-weight:600;color:#e65100;">' + costTxt + '</div></div>';
   var typeLbl2 = p.covered ? '🏠 Bajo techo' : '🌤️ Al aire libre';
-  infoHtml += '<div style="background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:7px 8px;text-align:center;">'
+  infoHtml += '<div style="background:#fff;border:1.5px solid #94a3b8;border-radius:10px;padding:7px 8px;text-align:center;">'
     + '<div style="font-size:.58rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600;">Cobertura</div>'
     + '<div style="font-size:.75rem;font-weight:600;color:#64748b;">' + typeLbl2 + '</div></div>';
-  if (a) infoHtml += '<div style="background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:7px 8px;text-align:center;">'
+  if (a) infoHtml += '<div style="background:#fff;border:1.5px solid #94a3b8;border-radius:10px;padding:7px 8px;text-align:center;">'
     + '<div style="font-size:.58rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600;">Rating</div>'
     + '<div style="font-size:.8rem;font-weight:600;color:#f59e0b;">★ ' + a + '</div></div>';
   var cols = a ? '1fr 1fr 1fr' : '1fr 1fr';
@@ -2452,11 +2452,11 @@ function showDetail(p) {
   html += '<div class="ibox"><div class="ibox-lbl">Estado</div><div class="ibox-val ' + (open ? 'v-green' : 'v-red') + '">' + (open ? 'Abierto' : 'Cerrado') + '</div></div>';
   html += '<div class="ibox"><div class="ibox-lbl">Costo</div><div class="ibox-val v-orange">' + dcost(p.cost) + '</div></div>';
   html += '<div class="ibox"><div class="ibox-lbl">Tipo</div><div class="ibox-val">' + (p.covered ? '<span style="color:#0277bd">🏠 Bajo techo</span>' : '<span style="color:#f59e0b">🌤️ Al aire libre</span>') + '</div></div>';
-  html += '<div class="ibox" style="grid-column:1/-1"><div class="ibox-lbl">Valoración media</div>';
+  html += '<div class="ibox" style="grid-column:1/-1;cursor:pointer;" onclick="document.getElementById(\"reviews-section-' + p.id + '\").scrollIntoView({behavior:\"smooth\"})"><div class="ibox-lbl">Valoración media 👇 ver opiniones</div>';
   if (a) {
     html += '<div class="ibox-val v-yellow">★ ' + a + ' / 5 (' + p.reviews.length + ' opinión' + (p.reviews.length !== 1 ? 'es' : '') + ')</div>';
   } else {
-    html += '<div class="ibox-val" style="color:#6b7280;font-size:.82rem">Sin valoraciones aún</div>';
+    html += '<div class="ibox-val" style="color:#6b7280;font-size:.82rem">Sin valoraciones aún — ¡sé el primero!</div>';
   }
   html += '</div></div>';
 
@@ -2505,7 +2505,7 @@ function showDetail(p) {
   }
 
   // Reviews
-  html += '<div class="sec-title">💬 Opiniones (' + p.reviews.length + ')</div>';
+  html += '<div class="sec-title" id="reviews-section-' + p.id + '">💬 Opiniones (' + p.reviews.length + ')</div>';
   html += '<div class="rev-list">';
   if (p.reviews.length) {
     for (var j = 0; j < p.reviews.length; j++) {
