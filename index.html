@@ -397,7 +397,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   <div class="ob-slide active" id="ob-0">
     <div class="ob-icon">🚲</div>
     <div class="ob-title">Bienvenido a ParkBike</div>
-    <div class="ob-text">Tu guía de estacionamientos para bicicletas y monopatines en Montevideo.</div>
+    <div class="ob-text">Encontrá estacionamiento para tu bici o monopatín en tu ciudad.</div>
   </div>
   <div class="ob-slide" id="ob-1">
     <div class="ob-icon">🗺️</div>
@@ -412,7 +412,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   <div class="ob-slide" id="ob-3">
     <div class="ob-icon">💬</div>
     <div class="ob-title">Compartí tu experiencia</div>
-    <div class="ob-text">Dejá opiniones, reportá problemas y ayudá a la comunidad ciclista de Montevideo.</div>
+    <div class="ob-text">Dejá opiniones, reportá problemas y ayudá a la comunidad ciclista de tu ciudad.</div>
   </div>
   <div class="ob-dots">
     <div class="ob-dot on" id="ob-dot-0"></div>
@@ -454,7 +454,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
         <div class="a-field"><label>Contraseña</label><input type="password" id="l-pwd" placeholder="••••••••" autocomplete="current-password"></div>
         <div class="a-err" id="l-err"></div>
         <button class="a-btn" onclick="doLogin()">Entrar →</button>
-        <div class="a-note">¿No tenés cuenta? Tocá Registrarse.<br><span class="a-demo" style="cursor:pointer;text-decoration:underline;" onclick="fillDemo()">▶ Entrar con cuenta demo</span><br><span style="color:#c4b5fd;font-size:.65rem;cursor:pointer;" onclick="localStorage.removeItem('ob_done');location.reload();">Ver introducción</span></div>
+        <div class="a-note">¿No tenés cuenta? Tocá Registrarse.<br><span class="a-demo" style="cursor:pointer;text-decoration:underline;" onclick="fillDemo()">▶ Entrar con cuenta demo</span><br><span style="color:#6366f1;font-size:.72rem;font-weight:600;cursor:pointer;text-decoration:underline;" onclick="localStorage.removeItem('ob_done');location.reload();">Ver introducción</span></div>
       </div>
       <!-- REGISTER -->
       <div id="tab-reg" style="display:none">
@@ -606,7 +606,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
       </div>
       <div id="recent-section" style="display:none;border-bottom:1px solid #e2e6ed;">
         <div onclick="toggleRecent()" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;">
-          <div style="font-size:.68rem;color:#374151;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;font-weight:600;">🕐 Vistos recientemente</div>
+          <div style="font-size:.68rem;color:#1a1f2e;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:.8px;font-weight:700;">🕐 Vistos recientemente</div>
           <div id="recent-toggle-icon" style="width:28px;height:28px;background:#e0e7ff;border:1.5px solid #c7d2fe;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#4338ca;flex-shrink:0;font-weight:700;">▾</div>
         </div>
         <div id="recent-list" style="display:none;flex-direction:column;gap:4px;padding:4px 14px 10px;"></div>
