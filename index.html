@@ -232,7 +232,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 .det-addr { font-size:.83rem; color:#6b7280; margin-bottom:16px; line-height:1.5; }
 .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
 .ibox { background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:14px; padding:14px 12px; }
-.ibox-lbl { font-size:.6rem; color:#94a3b8; font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.8px; margin-bottom:5px; font-weight:700; }
+.ibox-lbl { font-size:.6rem; color:#64748b; font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:.8px; margin-bottom:5px; font-weight:700; }
 .ibox-val { font-size:.95rem; font-weight:700; }
 .v-green { color:#2e7d32; } .v-red { color:#c62828; } .v-yellow { color:#f59e0b; } .v-orange { color:#e65100; font-size:.82rem; }
 .contact-block { margin-bottom:16px; }
@@ -2371,14 +2371,14 @@ function showPopup(p) {
   // Info boxes
   var costTxt = dcost(p.cost).replace(/[🟢💲]/g,'').trim();
   var infoHtml = '<div style="background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:7px 8px;text-align:center;">'
-    + '<div style="font-size:.56rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Costo</div>'
+    + '<div style="font-size:.58rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600;">Costo</div>'
     + '<div style="font-size:.8rem;font-weight:600;color:#e65100;">' + costTxt + '</div></div>';
   var typeLbl2 = p.covered ? '🏠 Bajo techo' : '🌤️ Al aire libre';
   infoHtml += '<div style="background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:7px 8px;text-align:center;">'
-    + '<div style="font-size:.56rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Cobertura</div>'
+    + '<div style="font-size:.58rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600;">Cobertura</div>'
     + '<div style="font-size:.75rem;font-weight:600;color:#64748b;">' + typeLbl2 + '</div></div>';
   if (a) infoHtml += '<div style="background:#fff;border:1px solid #d1d5db;border-radius:10px;padding:7px 8px;text-align:center;">'
-    + '<div style="font-size:.56rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Rating</div>'
+    + '<div style="font-size:.58rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600;">Rating</div>'
     + '<div style="font-size:.8rem;font-weight:600;color:#f59e0b;">★ ' + a + '</div></div>';
   var cols = a ? '1fr 1fr 1fr' : '1fr 1fr';
   el('mc-info').style.gridTemplateColumns = cols;
@@ -2550,10 +2550,10 @@ function toggleSheet() {
   var sb = el('sidebar');
   var arrow = el('sheet-arrow');
   if (sheetState === 0) {
-    sb.style.transform = 'translateY(calc(100% - 72px))';
+    sb.style.transform = 'translateY(calc(100% - 160px))';
     if (arrow) arrow.textContent = '↑';
   } else if (sheetState === 1) {
-    sb.style.transform = 'translateY(40%)';
+    sb.style.transform = 'translateY(30%)';
     if (arrow) arrow.textContent = '↑';
   } else {
     sb.style.transform = 'translateY(0)';
