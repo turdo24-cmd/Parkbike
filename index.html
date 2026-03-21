@@ -2576,6 +2576,13 @@ function closeDetail() {
 // SHEET (mobile)
 // ═══════════════════════════════════════════════════
 var sheetState = 0; // 0=peek, 1=half, 2=full
+function setLocateVisibility(visible) {
+  var loc = el('btn-locate');
+  if (!loc) return;
+  loc.style.opacity = visible ? '1' : '0';
+  loc.style.pointerEvents = visible ? '' : 'none';
+  loc.style.transition = 'opacity .3s';
+}
 function toggleSheet() {
   if (window.innerWidth >= 700) return;
   sheetState = (sheetState + 1) % 3;
@@ -2584,12 +2591,15 @@ function toggleSheet() {
   if (sheetState === 0) {
     sb.style.transform = 'translateY(calc(100% - 160px))';
     if (arrow) arrow.textContent = '↑';
+    setLocateVisibility(true);
   } else if (sheetState === 1) {
     sb.style.transform = 'translateY(30%)';
     if (arrow) arrow.textContent = '↑';
+    setLocateVisibility(false);
   } else {
     sb.style.transform = 'translateY(0)';
     if (arrow) arrow.textContent = '↓';
+    setLocateVisibility(false);
   }
 }
 function expandSheet() {
@@ -2597,6 +2607,7 @@ function expandSheet() {
   sheetState = 2;
   el('sidebar').style.transform = 'translateY(0)';
   el('sidebar').classList.add('up');
+  setLocateVisibility(false);
 }
 function collapseSheet() {
   if (window.innerWidth >= 700) return;
@@ -2605,6 +2616,7 @@ function collapseSheet() {
   el('sidebar').classList.remove('up');
   var arrow = el('sheet-arrow');
   if (arrow) arrow.textContent = '↑';
+  setLocateVisibility(true);
 }
 
 // ═══════════════════════════════════════════════════
