@@ -267,7 +267,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 @media (max-width:699px) {
   .content { display:block; }
   #map { position:absolute; inset:0; height:100%; }
-  .sidebar { position:absolute; bottom:0; left:0; right:0; width:100%; height:calc(100% - 50px); border-left:none; border-radius:18px 18px 0 0; box-shadow:0 -4px 24px rgba(0,0,0,.15); transform:translateY(calc(100% - 160px)); transition:transform .35s ease; z-index:50; }
+  .sidebar { position:absolute; bottom:0; left:0; right:0; width:100%; height:calc(100% - 50px); border-left:none; border-radius:18px 18px 0 0; box-shadow:0 -4px 24px rgba(0,0,0,.15); transform:translateY(calc(100% - 260px)); transition:transform .35s ease; z-index:50; }
   .sidebar.up { transform:translateY(0); }
   .sb-head { cursor:pointer; padding-top:8px; user-select:none; -webkit-user-select:none; }
   .sb-handle { width:36px; height:4px; background:#e2e6ed; border-radius:2px; margin:0 auto 8px; }
@@ -583,6 +583,9 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
         <div id="mc-info" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;"></div>
         <div id="mc-phone"></div>
         <div id="mc-fav-wrap" style="margin-bottom:8px;"></div>
+        <div id="mc-reviews-btn" style="margin-bottom:6px;display:none;">
+          <button id="mc-see-reviews" style="width:100%;padding:9px;background:#fffbeb;border:1.5px solid #fbbf24;color:#92400e;border-radius:12px;font-family:Inter,sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;text-align:center;">💬 Ver opiniones</button>
+        </div>
         <div id="mc-btns" style="display:flex;gap:8px;margin-top:2px;">
           <button id="mc-dir-btn" style="flex:1;padding:10px;background:#f0f4ff;border:1.5px solid #e0e7ff;color:#6366f1;border-radius:12px;font-family:Inter,sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;text-align:center;">🗺️ Cómo llegar</button>
           <button onclick="closeMapCard()" style="flex:1;padding:10px;background:#f1f5f9;border:1.5px solid #e2e8f0;color:#64748b;border-radius:12px;font-family:Inter,sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;text-align:center;">✕ Cerrar</button>
@@ -1156,6 +1159,7 @@ function locateMe() {
     if (btn) btn.textContent = '📍';
     placeUserMarker(lat, lng);
     leafMap.flyTo([lat, lng], 15, { duration: 1 });
+    if (btn) { btn.style.opacity = '0'; btn.style.pointerEvents = 'none'; setTimeout(function(){ btn.style.opacity = '1'; btn.style.pointerEvents = ''; }, 8000); }
   }, function(err) {
     if (btn) btn.textContent = '📍';
     alert('No se pudo obtener tu ubicación. Verificá los permisos en Ajustes → Safari → Ubicación.');
@@ -2377,8 +2381,8 @@ function showPopup(p) {
   infoHtml += '<div style="background:#fff;border:1.5px solid #94a3b8;border-radius:10px;padding:7px 8px;text-align:center;">'
     + '<div style="font-size:.58rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600;">Cobertura</div>'
     + '<div style="font-size:.75rem;font-weight:600;color:#64748b;">' + typeLbl2 + '</div></div>';
-  if (a) infoHtml += '<div style="background:#fff;border:1.5px solid #94a3b8;border-radius:10px;padding:7px 8px;text-align:center;">'
-    + '<div style="font-size:.58rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600;">Rating</div>'
+  if (a) infoHtml += '<div style="background:#fffbeb;border:1.5px solid #fbbf24;border-radius:10px;padding:7px 8px;text-align:center;cursor:pointer;" onclick="showDetailById(' + p.id + ');setTimeout(function(){var el=document.getElementById(\'reviews-section-' + p.id + '\');if(el)el.scrollIntoView({behavior:\'smooth\'});},400)">'
+    + '<div style="font-size:.58rem;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600;">Rating 👇</div>'
     + '<div style="font-size:.8rem;font-weight:600;color:#f59e0b;">★ ' + a + '</div></div>';
   var cols = a ? '1fr 1fr 1fr' : '1fr 1fr';
   el('mc-info').style.gridTemplateColumns = cols;
@@ -2394,6 +2398,19 @@ function showPopup(p) {
   el('mc-phone').innerHTML = contactHtml;
   // Buttons
   el('mc-dir-btn').onclick = function() { window.open('https://www.google.com/maps/dir/?api=1&destination=' + p.lat + ',' + p.lng + '&travelmode=bicycling', '_blank'); };
+  var revBtn = el('mc-reviews-btn');
+  var revBtnInner = el('mc-see-reviews');
+  if (revBtn && p.reviews && p.reviews.length) {
+    revBtn.style.display = 'block';
+    revBtnInner.onclick = function() {
+      closeMapCard();
+      showDetailById(p.id);
+      setTimeout(function() {
+        var anchor = document.getElementById('reviews-section-' + p.id);
+        if (anchor) anchor.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    };
+  } else if (revBtn) { revBtn.style.display = 'none'; }
   // Botón favorito en map-card
   var favWrap = el('mc-fav-wrap');
   if (favWrap && currentUser) {
@@ -2550,7 +2567,7 @@ function toggleSheet() {
   var sb = el('sidebar');
   var arrow = el('sheet-arrow');
   if (sheetState === 0) {
-    sb.style.transform = 'translateY(calc(100% - 160px))';
+    sb.style.transform = 'translateY(calc(100% - 260px))';
     if (arrow) arrow.textContent = '↑';
   } else if (sheetState === 1) {
     sb.style.transform = 'translateY(30%)';
