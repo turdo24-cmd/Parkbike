@@ -189,7 +189,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
 /* SIDEBAR */
 .sidebar { width:340px; background:#fff; border-left:1px solid #e2e6ed; display:flex; flex-direction:column; flex-shrink:0; position:relative; overflow:hidden; }
 .sb-head { padding:12px 16px; border-bottom:1px solid #e2e6ed; flex-shrink:0; }
-.sb-title { font-size:.68rem; color:#6b7280; font-family:'Sora',sans-serif; text-transform:uppercase; letter-spacing:.8px; }
+.sb-title { font-size:.62rem; color:#6b7280; font-family:'Sora',sans-serif; text-transform:uppercase; letter-spacing:.8px; }
 .sb-count { font-size:.8rem; font-weight:600; color:#1a1f2e; margin-top:2px; }
 .park-list { overflow-y:auto; flex:1; }
 .park-list::-webkit-scrollbar { width:3px; }
@@ -269,11 +269,11 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
   #map { position:absolute; inset:0; height:100%; }
   .sidebar { position:absolute; bottom:0; left:0; right:0; width:100%; height:calc(100% - 50px); border-left:none; border-radius:18px 18px 0 0; box-shadow:0 -4px 24px rgba(0,0,0,.15); transform:translateY(calc(100% - 160px)); transition:transform .35s ease; z-index:50; }
   .sidebar.up { transform:translateY(0); }
-  .sb-head { cursor:pointer; padding-top:8px; user-select:none; -webkit-user-select:none; }
-  .sb-handle { width:36px; height:4px; background:#e2e6ed; border-radius:2px; margin:0 auto 8px; }
+  .sb-head { cursor:pointer; padding:6px 14px 6px !important; user-select:none; -webkit-user-select:none; }
+  .sb-handle { width:32px; height:3px; background:#e2e6ed; border-radius:2px; margin:0 auto 5px; }
   .btn-add { display:none; }
   #fab { display:none; position:absolute; bottom:170px; right:14px; z-index:200; width:46px; height:46px; border-radius:50%; background:#2e7d32; color:#fff; border:3px solid #fff; cursor:pointer; font-size:1.5rem; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(46,125,50,.5); }
-  #btn-locate { display:flex; position:absolute; bottom:175px; right:14px; z-index:200; width:44px; height:44px; border-radius:50%; background:#fff; color:#6366f1; border:2px solid #e0e7ff; cursor:pointer; font-size:1.2rem; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+  #btn-locate { display:flex; position:absolute; bottom:180px; right:14px; z-index:200; width:40px; height:40px; border-radius:50%; background:#fff; color:#6366f1; border:2px solid #e0e7ff; cursor:pointer; font-size:1.1rem; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,.15); }
 
   /* Mobile: fila 1 = 3 botones, fila 2 = 4 botones */
   .filters { height:auto !important; display:grid !important; grid-template-columns:repeat(4,1fr); padding:5px 8px; gap:4px; overflow:visible; }
@@ -600,7 +600,7 @@ html, body { height:100%; background:#f8f9fa; color:#1a1f2e; font-family:'Inter'
             <div class="sb-title">📍 Parkings en Montevideo</div>
             <div class="sb-count" id="sb-count">Cargando…</div>
           </div>
-          <div id="sheet-arrow" style="display:flex;width:32px;height:32px;background:#f0f4ff;border:1.5px solid #e0e7ff;border-radius:50%;align-items:center;justify-content:center;font-size:1rem;color:#6366f1;flex-shrink:0;font-weight:700;">↑</div>
+          <div id="sheet-arrow" style="display:flex;width:28px;height:28px;background:#f0f4ff;border:1.5px solid #e0e7ff;border-radius:50%;align-items:center;justify-content:center;font-size:.85rem;color:#6366f1;flex-shrink:0;font-weight:700;">↑</div>
         </div>
       </div>
       <div id="recent-section" style="display:none;border-bottom:1px solid #e2e6ed;">
